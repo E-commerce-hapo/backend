@@ -6,18 +6,20 @@
 package build
 
 import (
+	"github.com/kiem-toan/application/category"
 	"github.com/kiem-toan/cmd/audit-server/config"
 	"github.com/kiem-toan/infrastructure/database"
-	"github.com/kiem-toan/interface/controller/category"
-	category2 "github.com/kiem-toan/interface/handler/category"
+	category2 "github.com/kiem-toan/interface/controller/category"
+	category3 "github.com/kiem-toan/interface/handler/category"
 )
 
 // Injectors from wire.go:
 
 func InitApp(cfg config.Config) (*App, error) {
 	databaseDatabase := database.New(cfg)
-	categoryService := category.New(databaseDatabase)
-	categoryHandler := category2.New(categoryService)
+	categoryAggregate := category.NewCategoryAggregate(databaseDatabase)
+	categoryService := category2.New(categoryAggregate)
+	categoryHandler := category3.New(categoryService)
 	app := &App{
 		Db:              databaseDatabase,
 		CategoryService: categoryService,
@@ -30,6 +32,6 @@ func InitApp(cfg config.Config) (*App, error) {
 
 type App struct {
 	Db              *database.Database
-	CategoryService *category.CategoryService
-	CategoryHandler *category2.CategoryHandler
+	CategoryService *category2.CategoryService
+	CategoryHandler *category3.CategoryHandler
 }

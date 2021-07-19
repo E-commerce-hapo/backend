@@ -1,8 +1,9 @@
 package category
 
 import (
-	category2 "github.com/kiem-toan/domain/api/category"
 	"net/http"
+
+	category2 "github.com/kiem-toan/domain/api/category"
 
 	"github.com/kiem-toan/infrastructure/httpx"
 	"github.com/kiem-toan/interface/controller/category"
@@ -18,10 +19,6 @@ func New(categorySvc *category.CategoryService) *CategoryHandler {
 	}
 }
 
-type Test struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-}
 // swagger:route POST /"url" "danh mục" "kiểu request"
 // swagger:route POST /CreateCategory  Category CreateCategoryRequest
 // responses:
@@ -31,7 +28,7 @@ func (h *CategoryHandler) CreateCategoryHandler(w http.ResponseWriter, r *http.R
 	if err := httpx.ParseRequest(r, &t); err != nil {
 		httpx.RespondError(w, err)
 	}
-	inter, err := h.CategoryService.CreateCategory(t)
+	inter, err := h.CategoryService.CreateCategory(nil, t)
 	if err != nil {
 		httpx.RespondError(w, err)
 		return

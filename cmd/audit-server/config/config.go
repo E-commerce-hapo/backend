@@ -3,10 +3,11 @@ package config
 import (
 	"errors"
 	"flag"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"reflect"
+
+	"gopkg.in/yaml.v2"
 )
 
 var (
@@ -83,12 +84,12 @@ func Default() Config {
 func DefaultPostgres() ConfigPostgres {
 	return ConfigPostgres{
 		Protocol:       "",
-		Host:           "postgres",
+		Host:           "localhost",
 		Port:           5432,
 		Username:       "postgres",
 		Password:       "postgres",
-		Database:       "test",
-		SSLMode:        "",
+		Database:       "postgres",
+		SSLMode:        "disable",
 		Timeout:        15,
 		GoogleAuthFile: "",
 	}

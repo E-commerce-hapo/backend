@@ -3,7 +3,6 @@ package idx
 import (
 	"crypto/rand"
 	"fmt"
-	"github.com/k0kubun/pp"
 
 	"time"
 )
@@ -18,11 +17,6 @@ const magicNumber = int64(1012345678909e6>>24 + 1)
 var zeroDate = time.Date(2018, 02, 15, 17, 0, 0, 0, time.UTC)
 var startDate = FromMillis(zeroDate.UnixNano()/1e6 - magicNumber*10)
 
-func main() {
-	fmt.Println(magicNumber)
-	fmt.Println(NewID())
-}
-
 func NewID() ID {
 	return ID(NewIDWithTime(time.Now()))
 }
@@ -32,11 +26,9 @@ func NewIDWithTime(t time.Time) int64 {
 	var b [3]byte
 	_, err := rand.Read(b[:])
 	if err != nil {
-
 	}
 
 	d := int64(t.Sub(startDate)) / 1e7
-	pp.Println(t.Sub(startDate))
 	id := d<<24 | int64(b[0])<<16 | int64(b[1])<<8 | int64(b[2])
 	return id & ^int64(1<<24)
 }

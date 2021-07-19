@@ -3,5 +3,5 @@ package category
 import "context"
 
 type CategoryService interface {
-	CreateCategory(context.Context, int) error
+	CreateCategory(context.Context, *CreateCategoryArgs) error
 }

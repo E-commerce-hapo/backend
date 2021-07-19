@@ -1,13 +1,29 @@
 version: "3.9"
 
 services:
-  db:
-    image: postgres
-    volumes:
-      - ./data/db:/var/lib/postgresql/data
+  hapo_server:
+    container_name: hapo_server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+    networks: ["go_develop"]
+  postgres:
+    container_name: hapo_postgres
+    image: postgres:12
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-volumes:
-  todo-mysql-data:
+    ports:
+      - 5432:5432
+    networks: ["go_develop"]
+    restart: always
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d/
+networks:
+  go_develop:
+    driver: bridge

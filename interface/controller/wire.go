@@ -5,7 +5,6 @@ import (
 	"github.com/kiem-toan/interface/controller/category"
 )
 
-
 var WireSet = wire.NewSet(
 	category.New,
 )

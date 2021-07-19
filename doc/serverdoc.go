@@ -38,4 +38,3 @@ sa
 		_, _ = fmt.Fprintf(w, tpl)
 	}
 }
-

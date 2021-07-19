@@ -4,12 +4,13 @@ package build
 
 import (
 	"github.com/google/wire"
+	categorying "github.com/kiem-toan/application/category"
 	"github.com/kiem-toan/cmd/audit-server/config"
 	"github.com/kiem-toan/infrastructure/database"
-	_all_controller"github.com/kiem-toan/interface/controller"
-	_all_handler"github.com/kiem-toan/interface/handler"
+	_all_controller "github.com/kiem-toan/interface/controller"
 	"github.com/kiem-toan/interface/controller/category"
-	category_handler"github.com/kiem-toan/interface/handler/category"
+	_all_handler "github.com/kiem-toan/interface/handler"
+	category_handler "github.com/kiem-toan/interface/handler/category"
 )
 
 func InitApp(cfg config.Config) (*App, error) {
@@ -17,6 +18,7 @@ func InitApp(cfg config.Config) (*App, error) {
 		database.WireSet,
 		_all_controller.WireSet,
 		_all_handler.WireSet,
+		categorying.WireSet,
 		wire.Struct(new(App), "*"),
 	)
 	return &App{}, nil

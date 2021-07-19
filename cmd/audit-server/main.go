@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+
 	"github.com/kiem-toan/cmd/audit-server/build"
 	"github.com/kiem-toan/cmd/audit-server/config"
 	_interface "github.com/kiem-toan/interface"
 	_ "github.com/lib/pq"
-	"log"
-	"net/http"
 )
 
 func main() {

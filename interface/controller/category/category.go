@@ -1,43 +1,41 @@
 package category
 
 import (
+	"context"
+
+	"github.com/kiem-toan/infrastructure/httpx"
+
+	"github.com/kiem-toan/infrastructure/idx"
+
+	service_category "github.com/kiem-toan/domain/service/category"
+
+	categorying "github.com/kiem-toan/application/category"
+
 	"github.com/kiem-toan/domain/api/category"
-	"github.com/kiem-toan/infrastructure/database"
-	"github.com/kiem-toan/infrastructure/errorx"
-	"gorm.io/gorm"
-	"net/http"
 )
 
 type CategoryService struct {
-	db *database.Database
+	CategoryAgg *categorying.CategoryAggregate
 }
 
 var _ category.ICategoryService = &CategoryService{}
 
-func New(db *database.Database) *CategoryService {
+func New(cateAgg *categorying.CategoryAggregate) *CategoryService {
 	return &CategoryService{
-		db: db,
+		CategoryAgg: cateAgg,
 	}
 }
 
-type ProductVariant struct {
-	gorm.Model
-	ID   string `json:"id"`
-	Name string `json:"name"`
-}
-
-func (*ProductVariant) TableName() string {
-	return "product_variant"
-}
-
-
-func (t *CategoryService) CreateCategory(i *category.CreateCategoryRequest) (*category.CreateCategoryResponse, error){
-	if i.ID == "1" {
-		return &category.CreateCategoryResponse{
-			ID:   "11111",
-			Name: "abccc",
-		}, nil
+func (t *CategoryService) CreateCategory(ctx context.Context, r *category.CreateCategoryRequest) (*httpx.CreatedResponse, error) {
+	category := &service_category.CreateCategoryArgs{
+		Name:        r.Name,
+		Description: r.Description,
+		ShopID:      idx.NewID(),
 	}
-	return nil, errorx.New(http.StatusBadRequest, nil, "bad request nè")
+	if err := t.CategoryAgg.CreateCategory(ctx, category); err != nil {
+		return nil, err
+	}
+	return &httpx.CreatedResponse{
+		Created: 1,
+	}, nil
 }
-

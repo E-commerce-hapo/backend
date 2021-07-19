@@ -1,7 +1,11 @@
 package category
 
-import "context"
+import (
+	"context"
+
+	service_category "github.com/kiem-toan/domain/service/category"
+)
 
 type CategoryRepositoryService interface {
-	InsertCategory(context.Context, int) error
+	CreateCategory(context.Context, *service_category.Category) error
 }
