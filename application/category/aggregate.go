@@ -15,7 +15,7 @@ type CategoryAggregate struct {
 	categoryStore sqlstore.CategoryStoreFactory
 }
 
-var _ service_category.CategoryService = &CategoryAggregate{}
+var _ service_category.CategoryAggrService = &CategoryAggregate{}
 
 func NewCategoryAggregate(db *database.Database) *CategoryAggregate {
 	return &CategoryAggregate{

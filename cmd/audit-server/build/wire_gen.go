@@ -18,7 +18,8 @@ import (
 func InitApp(cfg config.Config) (*App, error) {
 	databaseDatabase := database.New(cfg)
 	categoryAggregate := category.NewCategoryAggregate(databaseDatabase)
-	categoryService := category2.New(categoryAggregate)
+	categoryQuery := category.NewCategoryQuery(databaseDatabase)
+	categoryService := category2.New(categoryAggregate, categoryQuery)
 	categoryHandler := category3.New(categoryService)
 	app := &App{
 		Db:              databaseDatabase,

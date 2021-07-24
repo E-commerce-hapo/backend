@@ -8,4 +8,5 @@ import (
 
 type CategoryRepositoryService interface {
 	CreateCategory(context.Context, *service_category.Category) error
+	ListCategories(context.Context) ([]*service_category.Category, error)
 }

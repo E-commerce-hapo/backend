@@ -47,3 +47,19 @@ func (s *CategoryStore) createCategoryDB(ctx context.Context, categoryDB *repo_c
 	}
 	return nil
 }
+
+func (s *CategoryStore) ListCategoriesDB(ctx context.Context) (categoriesDB []*repo_cateogry.Category, err error) {
+	tx := s.gormDB.Where("deleted_at IS NULL").Find(&categoriesDB)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return categoriesDB, nil
+}
+
+func (s *CategoryStore) ListCategories(ctx context.Context) ([]*service_category.Category, error) {
+	categories, err := s.ListCategoriesDB(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return repo_cateogry.Convert_model_Categories_to_service_Categories(categories), nil
+}

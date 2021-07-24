@@ -31,7 +31,9 @@ func NewRouter(routes []Route) *mux.Router {
 
 func AllRoutes(app *build.App) []Route {
 	routes := []Route{
+		// CATEGORY
 		{"/CreateCategory", app.CategoryHandler.CreateCategoryHandler, http.MethodPost},
+		{"/ListCategories", app.CategoryHandler.ListCategoriesHandler, http.MethodPost},
 	}
 	return routes
 }

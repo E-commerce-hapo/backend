@@ -33,6 +33,18 @@ func (h *CategoryHandler) CreateCategoryHandler(w http.ResponseWriter, r *http.R
 		httpx.RespondError(w, err)
 		return
 	}
+	httpx.RespondJSON(w, http.StatusOK, inter)
+}
 
+func (h *CategoryHandler) ListCategoriesHandler(w http.ResponseWriter, r *http.Request) {
+	var t *category2.CreateCategoryRequest
+	if err := httpx.ParseRequest(r, &t); err != nil {
+		httpx.RespondError(w, err)
+	}
+	inter, err := h.CategoryService.ListCategories(nil, t)
+	if err != nil {
+		httpx.RespondError(w, err)
+		return
+	}
 	httpx.RespondJSON(w, http.StatusOK, inter)
 }
