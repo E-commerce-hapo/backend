@@ -2,7 +2,6 @@ package sqlstore
 
 import (
 	"context"
-
 	"github.com/kiem-toan/infrastructure/idx"
 
 	service_category "github.com/kiem-toan/domain/service/category"
@@ -48,8 +47,8 @@ func (s *CategoryStore) createCategoryDB(ctx context.Context, categoryDB *repo_c
 	return nil
 }
 
-func (s *CategoryStore) ListCategoriesDB(ctx context.Context) (categoriesDB []*repo_cateogry.Category, err error) {
-	tx := s.gormDB.Where("deleted_at IS NULL").Find(&categoriesDB)
+func (s *CategoryStore) listCategoriesDB(ctx context.Context) (categoriesDB []*repo_cateogry.Category, err error) {
+	tx := s.gormDB.Find(&categoriesDB)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -57,7 +56,7 @@ func (s *CategoryStore) ListCategoriesDB(ctx context.Context) (categoriesDB []*r
 }
 
 func (s *CategoryStore) ListCategories(ctx context.Context) ([]*service_category.Category, error) {
-	categories, err := s.ListCategoriesDB(ctx)
+	categories, err := s.listCategoriesDB(ctx)
 	if err != nil {
 		return nil, err
 	}
