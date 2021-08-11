@@ -1,13 +1,12 @@
 package config
 
 import (
-	"errors"
 	"flag"
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
+	"log"
 	"os"
 	"reflect"
-
-	"gopkg.in/yaml.v2"
 )
 
 var (
@@ -18,7 +17,7 @@ var (
 )
 
 func InitFlags() {
-	flag.StringVar(&flConfigFile, "config-file", "", "Path to config file")
+	flag.StringVar(&flConfigFile, "config-file", "server_config.yaml", "Path to config file")
 	flag.StringVar(&flConfigYaml, "config-yaml", "", "Config as yaml string")
 	flag.BoolVar(&flNoEnv, "no-env", false, "Don't read config from environment")
 	flag.BoolVar(&flExample, "example", false, "Print example config then exit")
@@ -26,7 +25,6 @@ func InitFlags() {
 
 func ParseFlags() {
 	flag.Parse()
-
 }
 
 // Load loads config from file
@@ -105,14 +103,13 @@ func LoadWithDefault(v, def interface{}) (err error) {
 			os.Exit(2)
 		}
 	}()
-
 	if (flConfigFile != "") && (flConfigYaml != "") {
-		return errors.New("must provide only -config-file or -config-yaml")
+		//return errors.New("must provide only -config-file or -config-yaml")
 	}
 	if flConfigFile != "" {
 		err = LoadFromFile(flConfigFile, v)
 		if err != nil {
-			//ll.S.Errorf("can not load config from file: %v (%v)", flConfigFile, err)
+			log.Fatal("can not load config from file: %v (%v)", flConfigFile, err)
 		}
 		return err
 	}
