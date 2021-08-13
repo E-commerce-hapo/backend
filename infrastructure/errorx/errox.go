@@ -1,8 +1,8 @@
 package errorx
 
 type Errorx struct {
-	StatusCode int    `json:"status_code"`
-	Err        error  `json:"err"`
+	StatusCode int    `json:"code"`
+	Err        error  `json:"error"`
 	Msg        string `json:"msg"`
 }
 

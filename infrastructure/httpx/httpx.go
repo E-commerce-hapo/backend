@@ -2,12 +2,19 @@ package httpx
 
 import (
 	"encoding/json"
-	"github.com/kiem-toan/infrastructure/errorx"
 	"io"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/kiem-toan/infrastructure/errorx"
 )
 
-func ParseRequest(r *http.Request, p interface{}) error {
+type Gin struct {
+	C *gin.Context
+}
+
+func (g *Gin) ParseRequest(p interface{}) error {
+	r := g.C.Request
 	dec := json.NewDecoder(r.Body)
 	dec.DisallowUnknownFields()
 	err := dec.Decode(&p)
@@ -17,24 +24,14 @@ func ParseRequest(r *http.Request, p interface{}) error {
 	return nil
 }
 
-func RespondJSON(w http.ResponseWriter, status int, payload interface{}) {
-	response, err := json.Marshal(payload)
-	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`Can not marshal response`))
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	w.Write(response)
+func (g *Gin) Response(status int, response interface{}) {
+	g.C.JSON(status, response)
 }
 
-func RespondError(w http.ResponseWriter, err error) {
+func (g *Gin) ResponseError(err error) {
 	if _err, ok := err.(*errorx.Errorx); ok {
-		RespondJSON(w, _err.StatusCode, err)
+		g.Response(_err.StatusCode, _err)
 	} else {
-		RespondJSON(w, http.StatusInternalServerError, err)
+		g.Response(http.StatusInternalServerError, err)
 	}
-
 }
