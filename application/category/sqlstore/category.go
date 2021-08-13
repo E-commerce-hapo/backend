@@ -2,9 +2,6 @@ package sqlstore
 
 import (
 	"context"
-	"fmt"
-
-	"github.com/k0kubun/pp"
 
 	"github.com/kiem-toan/infrastructure/idx"
 
@@ -19,7 +16,6 @@ import (
 
 type CategoryStore struct {
 	gormDB *gorm.DB
-	preds  []string
 }
 
 var _ repo_cateogry.CategoryRepositoryService = &CategoryStore{}
@@ -52,22 +48,8 @@ func (s *CategoryStore) createCategoryDB(ctx context.Context, categoryDB *repo_c
 	return nil
 }
 
-func (s *CategoryStore) IsDeleted() *CategoryStore {
-	s.preds = append(s.preds, "deleted_at IS NULL ")
-	return s
-}
-
-func (s *CategoryStore) ByName(name string) *CategoryStore {
-	s.preds = append(s.preds, fmt.Sprintf("name = '%v'", name))
-	return s
-}
-
-func (s *CategoryStore) ListCategoriesDB(ctx context.Context) (categoriesDB []*repo_cateogry.Category, err error) {
-	pp.Println(s.preds)
-	//tx := s.gormDB.Where(strings.Join(s.preds, "AND")).Find(&categoriesDB)
-	tx := s.gormDB.Where("name = 'abcc'").Find(&categoriesDB)
-	pp.Println(categoriesDB)
-	pp.Println(len(categoriesDB))
+func (s *CategoryStore) listCategoriesDB(ctx context.Context) (categoriesDB []*repo_cateogry.Category, err error) {
+	tx := s.gormDB.Find(&categoriesDB)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
@@ -75,7 +57,7 @@ func (s *CategoryStore) ListCategoriesDB(ctx context.Context) (categoriesDB []*r
 }
 
 func (s *CategoryStore) ListCategories(ctx context.Context) ([]*service_category.Category, error) {
-	categories, err := s.ListCategoriesDB(ctx)
+	categories, err := s.listCategoriesDB(ctx)
 	if err != nil {
 		return nil, err
 	}
