@@ -13,6 +13,7 @@ require (
 	github.com/k0kubun/pp v3.0.1+incompatible
 	github.com/lib/pq v1.10.2
 	github.com/mattn/go-colorable v0.1.8 // indirect
+	golang.org/x/crypto v0.0.0-20210812204632-0ba0e8f03122 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/postgres v1.1.0
 	gorm.io/gorm v1.21.11
