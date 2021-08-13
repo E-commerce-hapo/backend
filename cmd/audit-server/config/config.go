@@ -2,11 +2,12 @@ package config
 
 import (
 	"flag"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 	"os"
 	"reflect"
+
+	"gopkg.in/yaml.v2"
 )
 
 var (
