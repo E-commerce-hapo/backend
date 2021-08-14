@@ -17,7 +17,7 @@ import (
 const (
 	AuthorizationHeader         = "Authorization"
 	AuthorizationScheme         = "Bearer"
-	TokenExpiresDuration        = 1
+	TokenExpiresDuration        = 60
 	RefreshTokenExpiresDuration = 24 * 7
 )
 

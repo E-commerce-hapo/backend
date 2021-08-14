@@ -5,6 +5,8 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/k0kubun/pp"
+
 	"github.com/kiem-toan/infrastructure/auth"
 
 	"github.com/gin-gonic/gin"
@@ -35,6 +37,7 @@ func (g *Gin) ResponseError(err error) {
 	if _err, ok := err.(*errorx.Errorx); ok {
 		g.Response(_err.StatusCode, _err)
 	} else {
+		pp.Println(err)
 		g.Response(http.StatusInternalServerError, err)
 	}
 }

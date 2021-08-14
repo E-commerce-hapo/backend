@@ -7,24 +7,35 @@ package build
 
 import (
 	"github.com/kiem-toan/application/category"
+	"github.com/kiem-toan/application/product/pm"
 	"github.com/kiem-toan/cmd/audit-server/config"
 	"github.com/kiem-toan/infrastructure/database"
+	"github.com/kiem-toan/infrastructure/event/dispatcher"
 	category2 "github.com/kiem-toan/interface/controller/category"
+	"github.com/kiem-toan/interface/controller/product"
 	category3 "github.com/kiem-toan/interface/handler/category"
+	product2 "github.com/kiem-toan/interface/handler/product"
 )
 
 // Injectors from wire.go:
 
 func InitApp(cfg config.Config) (*App, error) {
 	databaseDatabase := database.New(cfg)
-	categoryAggregate := category.NewCategoryAggregate(databaseDatabase)
+	dispatcherDispatcher := dispatcher.NewDispatcher()
+	categoryAggregate := category.NewCategoryAggregate(databaseDatabase, dispatcherDispatcher)
 	categoryQuery := category.NewCategoryQuery(databaseDatabase)
 	categoryService := category2.New(categoryAggregate, categoryQuery)
 	categoryHandler := category3.New(categoryService)
+	productService := product.New()
+	productHandler := product2.New(productService)
+	productManager := pm.New(categoryQuery, dispatcherDispatcher)
 	app := &App{
 		Db:              databaseDatabase,
 		CategoryService: categoryService,
 		CategoryHandler: categoryHandler,
+		ProductService:  productService,
+		ProductHandler:  productHandler,
+		ProductManager:  productManager,
 	}
 	return app, nil
 }
@@ -35,4 +46,7 @@ type App struct {
 	Db              *database.Database
 	CategoryService *category2.CategoryService
 	CategoryHandler *category3.CategoryHandler
+	ProductService  *product.ProductService
+	ProductHandler  *product2.ProductHandler
+	ProductManager  *pm.ProductManager
 }

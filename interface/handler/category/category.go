@@ -39,6 +39,7 @@ func (h *CategoryHandler) CreateCategoryHandler(c *gin.Context) {
 	}
 	response, err := h.CategoryService.CreateCategory(nil, &t)
 	if err != nil {
+		pp.Println(err)
 		g.ResponseError(err)
 		return
 	}
