@@ -5,12 +5,15 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/kiem-toan/infrastructure/auth"
+
 	"github.com/gin-gonic/gin"
 	"github.com/kiem-toan/infrastructure/errorx"
 )
 
 type Gin struct {
-	C *gin.Context
+	C  *gin.Context
+	SS *auth.SessionInfo
 }
 
 func (g *Gin) ParseRequest(p interface{}) error {

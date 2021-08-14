@@ -3,6 +3,7 @@ package idx
 import (
 	"crypto/rand"
 	"fmt"
+	"strconv"
 
 	"time"
 )
@@ -57,4 +58,9 @@ func (t Timestamp) UnixNano() int64 {
 
 func (i *ID) String() string {
 	return fmt.Sprintf("%v", i)
+}
+
+func (i *ID) ParseID(s string) (ID, error) {
+	id, err := strconv.ParseInt(s, 10, 64)
+	return ID(id), err
 }

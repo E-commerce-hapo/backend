@@ -3,6 +3,12 @@ package category
 import (
 	"net/http"
 
+	"github.com/k0kubun/pp"
+
+	"github.com/kiem-toan/infrastructure/idx"
+
+	"github.com/kiem-toan/infrastructure/auth"
+
 	"github.com/kiem-toan/infrastructure/errorx"
 
 	"github.com/gin-gonic/gin"
@@ -25,6 +31,7 @@ func New(categorySvc *category.CategoryService) *CategoryHandler {
 
 func (h *CategoryHandler) CreateCategoryHandler(c *gin.Context) {
 	g := httpx.Gin{C: c}
+
 	var t category2.CreateCategoryRequest
 	if err := g.ParseRequest(&t); err != nil {
 		g.ResponseError(errorx.New(http.StatusInternalServerError, err, "Can not parse request"))
@@ -44,10 +51,53 @@ func (h *CategoryHandler) ListCategoriesHandler(c *gin.Context) {
 	if err := g.ParseRequest(&t); err != nil {
 		g.ResponseError(errorx.New(http.StatusInternalServerError, err, "Can not parse request"))
 	}
-	response, err := h.CategoryService.ListCategories(nil, &t)
+	pp.Println("c: ", c)
+	response, err := h.CategoryService.ListCategories(c, &t)
 	if err != nil {
 		g.ResponseError(err)
 		return
 	}
 	g.Response(http.StatusOK, response)
+}
+
+func (h *CategoryHandler) CreateTokenHandler(c *gin.Context) {
+	g := httpx.Gin{C: c}
+	var t category2.CreateCategoryRequest
+	if err := g.ParseRequest(&t); err != nil {
+		g.ResponseError(errorx.New(http.StatusInternalServerError, err, "Can not parse request"))
+	}
+	token, err := auth.GenerateToken(idx.NewID())
+	if err != nil {
+		g.ResponseError(err)
+		return
+	}
+	g.Response(http.StatusOK, token)
+}
+
+func (h *CategoryHandler) VerifyTokenHandler(c *gin.Context) {
+	g := httpx.Gin{C: c}
+	var t category2.CreateCategoryRequest
+	if err := g.ParseRequest(&t); err != nil {
+		g.ResponseError(errorx.New(http.StatusInternalServerError, err, "Can not parse request"))
+	}
+	claims, err := auth.ExtractTokenMetaData(g.C.Request)
+	if err != nil {
+		g.ResponseError(err)
+		return
+	}
+	g.Response(http.StatusOK, claims)
+}
+
+func (h *CategoryHandler) GetTokenDataHandler(c *gin.Context) {
+	g := httpx.Gin{C: c}
+	var t category2.CreateCategoryRequest
+	if err := g.ParseRequest(&t); err != nil {
+		g.ResponseError(errorx.New(http.StatusInternalServerError, err, "Can not parse request"))
+	}
+	claims, err := auth.ExtractTokenMetaData(g.C.Request)
+	if err != nil {
+		g.ResponseError(err)
+		return
+	}
+	g.Response(http.StatusOK, claims)
 }

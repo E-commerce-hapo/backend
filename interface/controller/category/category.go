@@ -3,6 +3,10 @@ package category
 import (
 	"context"
 
+	"github.com/kiem-toan/infrastructure/auth"
+
+	"github.com/k0kubun/pp"
+
 	"github.com/kiem-toan/infrastructure/httpx"
 
 	"github.com/kiem-toan/infrastructure/idx"
@@ -43,6 +47,9 @@ func (t *CategoryService) CreateCategory(ctx context.Context, r *category.Create
 }
 
 func (t *CategoryService) ListCategories(ctx context.Context, r *category.CreateCategoryRequest) (*category.ListCategoriesRequest, error) {
+	a := ctx.Value("SS").(*auth.SessionInfo)
+	pp.Println(a)
+
 	args := &service_category.CreateCategoryArgs{
 		Name:        r.Name,
 		Description: r.Description,

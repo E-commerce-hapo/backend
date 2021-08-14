@@ -5,6 +5,8 @@ go 1.16
 replace root => ./
 
 require (
+	github.com/cristalhq/jwt v1.2.0 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/gin-gonic/gin v1.7.3 // indirect
 	github.com/go-playground/validator/v10 v10.9.0 // indirect
 	github.com/go-resty/resty/v2 v2.4.0
