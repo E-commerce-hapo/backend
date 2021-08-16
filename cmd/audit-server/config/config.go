@@ -7,6 +7,8 @@ import (
 	"os"
 	"reflect"
 
+	"github.com/kiem-toan/infrastructure/integration/email"
+
 	"gopkg.in/yaml.v2"
 )
 
@@ -62,9 +64,10 @@ type DBConfig struct {
 
 // Config ...
 type Config struct {
-	Databases DBConfig `yaml:",inline"`
-	Env       string   `yaml:"env"`
-	Port      string   `yaml:"port"`
+	Databases DBConfig         `yaml:",inline"`
+	Env       string           `yaml:"env"`
+	Port      string           `yaml:"port"`
+	Email     email.SMTPConfig `yaml:"email"`
 }
 
 // Default ...
@@ -75,6 +78,14 @@ func Default() Config {
 		},
 		Env:  "dev",
 		Port: "8080",
+		Email: email.SMTPConfig{
+			Host:        "smtp.gmail.com",
+			Port:        587,
+			Username:    "shinichi24567@gmail.com",
+			Password:    "shinichi24567123",
+			Encrypt:     "tls",
+			FromAddress: "",
+		},
 	}
 	return cfg
 }

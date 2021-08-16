@@ -11,6 +11,7 @@ import (
 	"github.com/kiem-toan/cmd/audit-server/config"
 	"github.com/kiem-toan/infrastructure/database"
 	"github.com/kiem-toan/infrastructure/event/dispatcher"
+	"github.com/kiem-toan/infrastructure/integration/email"
 	category2 "github.com/kiem-toan/interface/controller/category"
 	"github.com/kiem-toan/interface/controller/product"
 	category3 "github.com/kiem-toan/interface/handler/category"
@@ -22,7 +23,8 @@ import (
 func InitApp(cfg config.Config) (*App, error) {
 	databaseDatabase := database.New(cfg)
 	dispatcherDispatcher := dispatcher.NewDispatcher()
-	categoryAggregate := category.NewCategoryAggregate(databaseDatabase, dispatcherDispatcher)
+	client := email.New()
+	categoryAggregate := category.NewCategoryAggregate(databaseDatabase, dispatcherDispatcher, client)
 	categoryQuery := category.NewCategoryQuery(databaseDatabase)
 	categoryService := category2.New(categoryAggregate, categoryQuery)
 	categoryHandler := category3.New(categoryService)

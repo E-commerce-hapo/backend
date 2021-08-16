@@ -13,3 +13,9 @@ postgres:
   google_auth_file: ""
 env: dev
 port: 8080
+email:
+  host: smtp.gmail.com
+  port: 587
+  username: shinichi24567@gmail.com
+  password: shinichi24567123
+  encrypt: tls

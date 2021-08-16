@@ -10,6 +10,7 @@ import (
 	"github.com/kiem-toan/cmd/audit-server/config"
 	"github.com/kiem-toan/infrastructure/database"
 	"github.com/kiem-toan/infrastructure/event/dispatcher"
+	"github.com/kiem-toan/infrastructure/integration/email"
 	_all_controller "github.com/kiem-toan/interface/controller"
 	"github.com/kiem-toan/interface/controller/category"
 	"github.com/kiem-toan/interface/controller/product"
@@ -26,6 +27,7 @@ func InitApp(cfg config.Config) (*App, error) {
 		category_app.WireSet,
 		product_app.WireSet,
 		dispatcher.WireSet,
+		email.WireSet,
 		wire.Struct(new(App), "*"),
 	)
 	return &App{}, nil
