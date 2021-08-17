@@ -3,10 +3,6 @@ package category
 import (
 	"context"
 
-	"github.com/kiem-toan/infrastructure/auth"
-
-	"github.com/k0kubun/pp"
-
 	"github.com/kiem-toan/infrastructure/httpx"
 
 	"github.com/kiem-toan/infrastructure/idx"
@@ -46,19 +42,21 @@ func (t *CategoryService) CreateCategory(ctx context.Context, r *category.Create
 	}, nil
 }
 
-func (t *CategoryService) ListCategories(ctx context.Context, r *category.CreateCategoryRequest) (*category.ListCategoriesRequest, error) {
-	a := ctx.Value("SS").(*auth.SessionInfo)
-	pp.Println(a)
-
-	args := &service_category.CreateCategoryArgs{
-		Name:        r.Name,
-		Description: r.Description,
-		ShopID:      idx.NewID(),
+func (t *CategoryService) ListCategories(ctx context.Context, r *category.ListCategoriesRequest) (*category.ListCategoriesResponse, error) {
+	svcPaging, err := r.Paging.Convert_api_Paging_to_service_Paging()
+	if err != nil {
+		return nil, err
+	}
+	args := &service_category.ListCategoriesArgs{
+		Paging: svcPaging,
 	}
 	categories, err := t.CategoryQuery.ListCategories(ctx, args)
 	if err != nil {
 		return nil, err
 	}
 
-	return &category.ListCategoriesRequest{Categories: category.Convert_service_Categories_to_api_Categories(categories)}, nil
+	return &category.ListCategoriesResponse{
+		Categories: category.Convert_service_Categories_to_api_Categories(categories),
+		Paging:     r.Paging.Convert_api_Paging_to_api_PagingInfo(len(categories)),
+	}, nil
 }

@@ -1,9 +1,10 @@
 package timex
 
 import (
-	"backend/common/jsonx"
 	"strconv"
 	"time"
+
+	"github.com/kiem-toan/infrastructure/jsonx"
 )
 
 // TimeAsMillis ...

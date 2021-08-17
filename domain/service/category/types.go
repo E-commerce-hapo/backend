@@ -3,6 +3,8 @@ package category
 import (
 	"time"
 
+	"github.com/kiem-toan/domain/service/common"
+
 	"github.com/kiem-toan/infrastructure/idx"
 )
 
@@ -19,4 +21,7 @@ type CreateCategoryArgs struct {
 	Name        string
 	Description string
 	ShopID      idx.ID
+}
+type ListCategoriesArgs struct {
+	Paging *common.Paging
 }

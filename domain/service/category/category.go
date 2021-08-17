@@ -7,5 +7,5 @@ type CategoryAggrService interface {
 }
 
 type CategoryQueryService interface {
-	ListCategories(context.Context, *CreateCategoryArgs) ([]*Category, error)
+	ListCategories(context.Context, *ListCategoriesArgs) ([]*Category, error)
 }

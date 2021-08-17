@@ -2,6 +2,9 @@ package sqlstore
 
 import (
 	"context"
+	"strings"
+
+	service_common "github.com/kiem-toan/domain/service/common"
 
 	"github.com/kiem-toan/infrastructure/idx"
 
@@ -28,6 +31,20 @@ func NewCategoryStore(db *database.Database) CategoryStoreFactory {
 			gormDB: db.Db,
 		}
 	}
+}
+
+func (s *CategoryStore) WithPaging(ctx context.Context, p *service_common.Paging) (*CategoryStore, error) {
+	err := p.Validate(&repo_cateogry.Category{})
+	if err != nil {
+		return nil, err
+	}
+
+	s.gormDB = s.gormDB.Limit(p.Limit).Offset(p.Offset)
+	if len(p.Sorts) > 0 {
+		sort := strings.Join(p.Sorts, ",")
+		s.gormDB = s.gormDB.Order(sort)
+	}
+	return s, nil
 }
 
 func (s *CategoryStore) CreateCategory(ctx context.Context, category *service_category.Category) error {

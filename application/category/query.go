@@ -20,8 +20,12 @@ func NewCategoryQuery(db *database.Database) *CategoryQuery {
 	}
 }
 
-func (c CategoryQuery) ListCategories(ctx context.Context, args *service_category.CreateCategoryArgs) ([]*service_category.Category, error) {
-	categories, err := c.categoryStore(ctx).ListCategories(ctx)
+func (c CategoryQuery) ListCategories(ctx context.Context, args *service_category.ListCategoriesArgs) ([]*service_category.Category, error) {
+	query, err := c.categoryStore(ctx).WithPaging(ctx, args.Paging)
+	if err != nil {
+		return nil, err
+	}
+	categories, err := query.ListCategories(ctx)
 	if err != nil {
 		return nil, err
 	}

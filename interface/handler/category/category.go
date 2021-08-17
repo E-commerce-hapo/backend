@@ -3,8 +3,6 @@ package category
 import (
 	"net/http"
 
-	"github.com/k0kubun/pp"
-
 	"github.com/kiem-toan/infrastructure/idx"
 
 	"github.com/kiem-toan/infrastructure/auth"
@@ -34,12 +32,11 @@ func (h *CategoryHandler) CreateCategoryHandler(c *gin.Context) {
 
 	var t category2.CreateCategoryRequest
 	if err := g.ParseRequest(&t); err != nil {
-		g.ResponseError(errorx.New(http.StatusInternalServerError, err, "Can not parse request"))
+		g.ResponseError(errorx.New(http.StatusBadRequest, err, "Can not parse request"))
 		return
 	}
 	response, err := h.CategoryService.CreateCategory(nil, &t)
 	if err != nil {
-		pp.Println(err)
 		g.ResponseError(err)
 		return
 	}
@@ -48,11 +45,11 @@ func (h *CategoryHandler) CreateCategoryHandler(c *gin.Context) {
 
 func (h *CategoryHandler) ListCategoriesHandler(c *gin.Context) {
 	g := httpx.Gin{C: c}
-	var t category2.CreateCategoryRequest
+	var t category2.ListCategoriesRequest
 	if err := g.ParseRequest(&t); err != nil {
-		g.ResponseError(errorx.New(http.StatusInternalServerError, err, "Can not parse request"))
+		g.ResponseError(errorx.New(http.StatusBadRequest, err, "Can not parse request"))
+		return
 	}
-	pp.Println("c: ", c)
 	response, err := h.CategoryService.ListCategories(c, &t)
 	if err != nil {
 		g.ResponseError(err)
@@ -65,7 +62,8 @@ func (h *CategoryHandler) CreateTokenHandler(c *gin.Context) {
 	g := httpx.Gin{C: c}
 	var t category2.CreateCategoryRequest
 	if err := g.ParseRequest(&t); err != nil {
-		g.ResponseError(errorx.New(http.StatusInternalServerError, err, "Can not parse request"))
+		g.ResponseError(errorx.New(http.StatusBadRequest, err, "Can not parse request"))
+		return
 	}
 	token, err := auth.GenerateToken(idx.NewID())
 	if err != nil {
@@ -79,7 +77,8 @@ func (h *CategoryHandler) VerifyTokenHandler(c *gin.Context) {
 	g := httpx.Gin{C: c}
 	var t category2.CreateCategoryRequest
 	if err := g.ParseRequest(&t); err != nil {
-		g.ResponseError(errorx.New(http.StatusInternalServerError, err, "Can not parse request"))
+		g.ResponseError(errorx.New(http.StatusBadRequest, err, "Can not parse request"))
+		return
 	}
 	claims, err := auth.ExtractTokenMetaData(g.C.Request)
 	if err != nil {
@@ -93,7 +92,7 @@ func (h *CategoryHandler) GetTokenDataHandler(c *gin.Context) {
 	g := httpx.Gin{C: c}
 	var t category2.CreateCategoryRequest
 	if err := g.ParseRequest(&t); err != nil {
-		g.ResponseError(errorx.New(http.StatusInternalServerError, err, "Can not parse request"))
+		g.ResponseError(errorx.New(http.StatusBadRequest, err, "Can not parse request"))
 	}
 	claims, err := auth.ExtractTokenMetaData(g.C.Request)
 	if err != nil {

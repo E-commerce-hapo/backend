@@ -19,6 +19,22 @@ type Redis struct {
 	Password string `yaml:"password"`
 }
 
+type Store interface {
+	Set(k string, v interface{}) error
+	SetWithTTL(k string, v interface{}, ttl int) error
+	Get(k string, v interface{}) error
+	SetString(k string, v string) error
+	SetStringWithTTL(k string, v string, ttl int) error
+	GetString(k string) (string, error)
+	GetStrings(p string) ([]string, error)
+	SetUint64(k string, v uint64) error
+	SetUint64WithTTL(k string, v uint64, ttl int) error
+	GetUint64(k string) (uint64, error)
+	GetTTL(k string) (int, error)
+	IsExist(k string) bool
+	Del(keys ...string) error
+}
+
 // ConnectionString ...
 func (c Redis) ConnectionString() string {
 	s := ""
@@ -47,22 +63,6 @@ func Connect(cfg Redis) Store {
 		//ll.Fatal("Unable to connect to Redis", l.Error(err), l.String("ConnectionString", cfg.ConnectionString()))
 	}
 	return store
-}
-
-type Store interface {
-	Set(k string, v interface{}) error
-	SetWithTTL(k string, v interface{}, ttl int) error
-	Get(k string, v interface{}) error
-	SetString(k string, v string) error
-	SetStringWithTTL(k string, v string, ttl int) error
-	GetString(k string) (string, error)
-	GetStrings(p string) ([]string, error)
-	SetUint64(k string, v uint64) error
-	SetUint64WithTTL(k string, v uint64, ttl int) error
-	GetUint64(k string) (uint64, error)
-	GetTTL(k string) (int, error)
-	IsExist(k string) bool
-	Del(keys ...string) error
 }
 
 type redisStore struct {
