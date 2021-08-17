@@ -7,6 +7,8 @@ import (
 	"os"
 	"reflect"
 
+	"github.com/kiem-toan/infrastructure/redis"
+
 	"github.com/kiem-toan/infrastructure/integration/email"
 
 	"gopkg.in/yaml.v2"
@@ -68,6 +70,7 @@ type Config struct {
 	Env       string           `yaml:"env"`
 	Port      string           `yaml:"port"`
 	Email     email.SMTPConfig `yaml:"email"`
+	redis     Redis            `yaml:"redis"`
 }
 
 // Default ...
@@ -105,6 +108,17 @@ func DefaultPostgres() ConfigPostgres {
 	}
 }
 
+type Redis = redis.Redis
+
+// DefaultRedis ...
+func DefaultRedis() Redis {
+	return Redis{
+		Host:     "redis",
+		Port:     "6379",
+		Username: "",
+		Password: "",
+	}
+}
 func LoadWithDefault(v, def interface{}) (err error) {
 	defer func() {
 		if flExample {

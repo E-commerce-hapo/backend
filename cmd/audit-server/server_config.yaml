@@ -19,3 +19,8 @@ email:
   username: shinichi24567@gmail.com
   password: shinichi24567123
   encrypt: tls
+redis:
+  host: redis
+  port: "6379"
+  username: ""
+  password: ""
