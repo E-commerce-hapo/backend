@@ -32,7 +32,6 @@ type Client struct {
 
 // New ...
 func New() *Client {
-
 	//cfg.Encrypt = strings.ToLower(cfg.Encrypt)
 	c := &Client{
 		cfg: SMTPConfig{

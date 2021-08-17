@@ -21,15 +21,24 @@ var (
 	flNoEnv      = false
 )
 
-func InitFlags() {
-	flag.StringVar(&flConfigFile, "config-file", "server_config.yaml", "Path to config file")
-	flag.StringVar(&flConfigYaml, "config-yaml", "", "Config as yaml string")
-	flag.BoolVar(&flNoEnv, "no-env", false, "Don't read config from environment")
-	flag.BoolVar(&flExample, "example", false, "Print example config then exit")
-}
-
-func ParseFlags() {
-	flag.Parse()
+// Default ...
+func Default() Config {
+	cfg := Config{
+		Databases: DBConfig{
+			Postgres: DefaultPostgres(),
+		},
+		Env:  "dev",
+		Port: "8080",
+		Email: email.SMTPConfig{
+			Host:        "smtp.gmail.com",
+			Port:        587,
+			Username:    "shinichi24567@gmail.com",
+			Password:    "shinichi24567123",
+			Encrypt:     "tls",
+			FromAddress: "",
+		},
+	}
+	return cfg
 }
 
 // Load loads config from file
@@ -41,6 +50,15 @@ func Load() (Config, error) {
 		return cfg, err
 	}
 	return cfg, err
+}
+
+// Config ...
+type Config struct {
+	Databases DBConfig         `yaml:",inline"`
+	Env       string           `yaml:"env"`
+	Port      string           `yaml:"port"`
+	Email     email.SMTPConfig `yaml:"email"`
+	redis     Redis            `yaml:"redis"`
 }
 
 type ConfigPostgres struct {
@@ -62,35 +80,6 @@ type ConfigPostgres struct {
 
 type DBConfig struct {
 	Postgres ConfigPostgres `yaml:"postgres"`
-}
-
-// Config ...
-type Config struct {
-	Databases DBConfig         `yaml:",inline"`
-	Env       string           `yaml:"env"`
-	Port      string           `yaml:"port"`
-	Email     email.SMTPConfig `yaml:"email"`
-	redis     Redis            `yaml:"redis"`
-}
-
-// Default ...
-func Default() Config {
-	cfg := Config{
-		Databases: DBConfig{
-			Postgres: DefaultPostgres(),
-		},
-		Env:  "dev",
-		Port: "8080",
-		Email: email.SMTPConfig{
-			Host:        "smtp.gmail.com",
-			Port:        587,
-			Username:    "shinichi24567@gmail.com",
-			Password:    "shinichi24567123",
-			Encrypt:     "tls",
-			FromAddress: "",
-		},
-	}
-	return cfg
 }
 
 // DefaultPostgres ...
@@ -157,4 +146,14 @@ func LoadFromFile(configPath string, v interface{}) (err error) {
 
 func LoadFromYaml(input []byte, v interface{}) (err error) {
 	return yaml.Unmarshal(input, v)
+}
+func InitFlags() {
+	flag.StringVar(&flConfigFile, "config-file", "server_config.yaml", "Path to config file")
+	flag.StringVar(&flConfigYaml, "config-yaml", "", "Config as yaml string")
+	flag.BoolVar(&flNoEnv, "no-env", false, "Don't read config from environment")
+	flag.BoolVar(&flExample, "example", false, "Print example config then exit")
+}
+
+func ParseFlags() {
+	flag.Parse()
 }

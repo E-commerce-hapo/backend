@@ -3,6 +3,8 @@ package category
 import (
 	"context"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/kiem-toan/infrastructure/httpx"
 
 	"github.com/kiem-toan/infrastructure/idx"
@@ -42,7 +44,7 @@ func (t *CategoryService) CreateCategory(ctx context.Context, r *category.Create
 	}, nil
 }
 
-func (t *CategoryService) ListCategories(ctx context.Context, r *category.ListCategoriesRequest) (*category.ListCategoriesResponse, error) {
+func (t *CategoryService) ListCategories(ctx *gin.Context, r *category.ListCategoriesRequest) (*category.ListCategoriesResponse, error) {
 	svcPaging, err := r.Paging.Convert_api_Paging_to_service_Paging()
 	if err != nil {
 		return nil, err
@@ -54,7 +56,6 @@ func (t *CategoryService) ListCategories(ctx context.Context, r *category.ListCa
 	if err != nil {
 		return nil, err
 	}
-
 	return &category.ListCategoriesResponse{
 		Categories: category.Convert_service_Categories_to_api_Categories(categories),
 		Paging:     r.Paging.Convert_api_Paging_to_api_PagingInfo(len(categories)),
