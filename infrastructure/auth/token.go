@@ -98,9 +98,23 @@ func verifyToken(r *http.Request) (*jwt.Token, error) {
 		}
 		return []byte(os.Getenv("ACCESS_SECRET")), nil
 	})
-	if time.Now().Unix() > atClaims.ExpiresAt {
-		return nil, errorx.New(http.StatusUnauthorized, nil, "Token have already expried")
+	if err != nil {
+		if ve, ok := err.(*jwt.ValidationError); ok {
+			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
+				return nil, errorx.New(http.StatusUnauthorized, nil, "ValidationErrorMalformed")
+			} else if ve.Errors&jwt.ValidationErrorExpired != 0 {
+				// Token is expired
+				return nil, errorx.New(http.StatusUnauthorized, nil, "Token have already expried")
+			} else if ve.Errors&jwt.ValidationErrorNotValidYet != 0 {
+				return nil, errorx.New(http.StatusUnauthorized, nil, "ValidationErrorNotValidYet")
+			} else {
+				return nil, errorx.New(http.StatusUnauthorized, nil, "TokenInvalid")
+			}
+		}
 	}
+	//if time.Now().Unix() > atClaims.ExpiresAt {
+	//	return nil, errorx.New(http.StatusUnauthorized, nil, "Token have already expried")
+	//}
 	if err != nil {
 		return nil, err
 	}

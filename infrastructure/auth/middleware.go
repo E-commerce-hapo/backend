@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/k0kubun/pp"
+	"github.com/kiem-toan/infrastructure/authorize/auth"
 
 	"github.com/kiem-toan/infrastructure/errorx"
 
@@ -48,21 +48,31 @@ func CORS(next http.Handler) http.HandlerFunc {
 
 func TokenAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		err := TokenValid(c.Request)
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, err)
-			c.Abort()
-			return
-		}
-		claims, err := ExtractTokenMetaData(c.Request)
-		_err, _ := err.(*errorx.Errorx)
-		if err != nil {
-			pp.Println(claims)
-			c.JSON(_err.StatusCode, _err)
-			c.Abort()
-			return
-		}
+		//err := TokenValid(c.Request)
+		//if err != nil {
+		//	c.JSON(http.StatusUnauthorized, err)
+		//	c.Abort()
+		//	return
+		//}
+		//claims, err := ExtractTokenMetaData(c.Request)
+		//_err, _ := err.(*errorx.Errorx)
+		//if err != nil {
+		//	pp.Println(claims)
+		//	c.JSON(_err.StatusCode, _err)
+		//	c.Abort()
+		//	return
+		//}
 		// TODO: Get user info and pass into SessionInfo
+		rolesAfterGetFromDB := auth.Roles{"admin", "accountant"}
+		urlFromRequest := "GetProduct"
+		methodFromRequest := "post"
+		action := strings.Join([]string{urlFromRequest, methodFromRequest}, ":")
+		e := auth.New()
+
+		if e.Check(rolesAfterGetFromDB, action) {
+			c.JSON(http.StatusUnauthorized, errorx.New(http.StatusUnauthorized, nil, "Không tìm thấy hoặc cần quyền truy cập.."))
+			return
+		}
 		var sessionInfo *SessionInfo
 		c.Set("SS", sessionInfo)
 		c.Next()

@@ -90,7 +90,7 @@ func DefaultPostgres() ConfigPostgres {
 		Port:           5432,
 		Username:       "postgres",
 		Password:       "postgres",
-		Database:       "postgres",
+		Database:       "hapo_postgres",
 		SSLMode:        "disable",
 		Timeout:        15,
 		GoogleAuthFile: "",
