@@ -10,9 +10,9 @@ import (
 
 	"github.com/kiem-toan/infrastructure/event/dispatcher"
 
-	"github.com/kiem-toan/infrastructure/idx"
+	"github.com/kiem-toan/pkg/idx"
 
-	"github.com/kiem-toan/infrastructure/database"
+	"github.com/kiem-toan/pkg/database"
 
 	"github.com/kiem-toan/application/category/sqlstore"
 	service_category "github.com/kiem-toan/domain/service/category"

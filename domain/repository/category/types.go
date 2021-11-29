@@ -1,18 +1,17 @@
 package category
 
 import (
-	"time"
-
-	"github.com/kiem-toan/infrastructure/idx"
+	"github.com/kiem-toan/pkg/idx"
+	"gorm.io/gorm"
 )
 
+// gorm.Model
 type Category struct {
-	ID          idx.ID
-	Name        string
+	gorm.Model
+	ID          idx.ID `gorm:"primaryKey"`
+	Name        string `gorm:"name"`
 	Description string
 	ShopID      idx.ID
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
 }
 
 func (*Category) TableName() string {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/kiem-toan/application/category/sqlstore"
 	service_category "github.com/kiem-toan/domain/service/category"
-	"github.com/kiem-toan/infrastructure/database"
+	"github.com/kiem-toan/pkg/database"
 )
 
 type CategoryQuery struct {

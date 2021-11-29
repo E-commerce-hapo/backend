@@ -17,6 +17,7 @@ COPY . .
 
 # Build the Go app
 RUN go build -o main ./cmd/audit-server
+RUN rm -rf /tmp/*
 
 # Expose port 8080 to the outside world
 EXPOSE 8080

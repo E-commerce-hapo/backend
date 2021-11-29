@@ -6,7 +6,7 @@ import (
 
 	service_common "github.com/kiem-toan/domain/service/common"
 
-	"github.com/kiem-toan/infrastructure/idx"
+	"github.com/kiem-toan/pkg/idx"
 
 	service_category "github.com/kiem-toan/domain/service/category"
 
@@ -14,7 +14,7 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/kiem-toan/infrastructure/database"
+	"github.com/kiem-toan/pkg/database"
 )
 
 type CategoryStore struct {
@@ -48,6 +48,7 @@ func (s *CategoryStore) WithPaging(ctx context.Context, p *service_common.Paging
 }
 
 func (s *CategoryStore) CreateCategory(ctx context.Context, category *service_category.Category) error {
+	s.gormDB.AutoMigrate(&repo_cateogry.Category{})
 	categoryDB := &repo_cateogry.Category{
 		ID:          idx.NewID(),
 		Name:        category.Name,

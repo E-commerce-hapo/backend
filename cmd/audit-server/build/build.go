@@ -1,7 +1,7 @@
 package build
 
 import (
-	"github.com/kiem-toan/infrastructure/database"
+	"github.com/kiem-toan/pkg/database"
 )
 
 type Output struct {
