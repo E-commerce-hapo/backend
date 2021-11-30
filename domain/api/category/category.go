@@ -8,4 +8,5 @@ import (
 
 type ICategoryService interface {
 	CreateCategory(context.Context, *CreateCategoryRequest) (*httpx.CreatedResponse, error)
+	ListCategories(context.Context, *ListCategoriesRequest) (*ListCategoriesResponse, error)
 }

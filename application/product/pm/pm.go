@@ -5,7 +5,7 @@ import (
 	"log"
 
 	categorying "github.com/kiem-toan/application/category"
-	"github.com/kiem-toan/infrastructure/event/dispatcher"
+	"github.com/kiem-toan/pkg/event/dispatcher"
 
 	category_domain "github.com/kiem-toan/domain/service/category"
 )

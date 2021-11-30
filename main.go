@@ -6,6 +6,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/gorilla/handlers"
 	"github.com/kiem-toan/cmd/audit-server/build"
@@ -65,6 +68,28 @@ func main() {
 			default:
 				log.Fatal(err, nil, nil)
 			}
+			// Gracefully shutdown
+			shutdownGracefully(s)
 		}()
 	}
+}
+
+func shutdownGracefully(s *http.Server) {
+	signChan := make(chan os.Signal, 1)
+	// Thiết lập một channel để lắng nghe tín hiệu dừng từ hệ điều hành,
+	// ở đây chúng ta lưu ý 2 tín hiệu (signal) là SIGINT và SIGTERM
+	signal.Notify(signChan, os.Interrupt, syscall.SIGTERM)
+	<-signChan
+	// Thiết lập một khoản thời gian (Timeout) để dừng hoàn toàn ứng dụng và đóng tất cả kết nối.
+	timeWait := 30 * time.Second
+	ctx, cancel := context.WithTimeout(context.Background(), timeWait)
+	defer func() {
+		log.Println("Close another connection")
+		cancel()
+	}()
+
+	if err := s.Shutdown(ctx); err == context.DeadlineExceeded {
+		log.Print("Halted active connections")
+	}
+	close(signChan)
 }

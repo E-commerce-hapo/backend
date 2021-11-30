@@ -3,6 +3,8 @@ package zipkin
 import (
 	"fmt"
 
+	"github.com/kiem-toan/pkg/config"
+
 	"os"
 
 	"github.com/openzipkin/zipkin-go"
@@ -17,7 +19,7 @@ func NewTracer() (*zipkin.Tracer, error) {
 	var endpointURL = "config.GetAppConfig().Zipkin.URL" + "/api/v2/spans"
 	// The reporter sends traces to zipkin server
 	reporter := reporterhttp.NewReporter(endpointURL)
-	hostPort := fmt.Sprintf("%v:%v", host, os.Getenv("SERVER_PORT"))
+	hostPort := fmt.Sprintf("%v:%v", host, config.Port)
 	localEndpoint, err := zipkin.NewEndpoint(os.Getenv("APPLICATION_NAME"), hostPort)
 	if err != nil {
 		return nil, err

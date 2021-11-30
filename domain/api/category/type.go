@@ -3,6 +3,8 @@ package category
 import (
 	"time"
 
+	"github.com/kiem-toan/domain/api/types/paging"
+
 	"github.com/kiem-toan/pkg/idx"
 )
 
@@ -26,5 +28,10 @@ type CreateCategoryResponse struct {
 }
 
 type ListCategoriesRequest struct {
-	Categories []*Category `json:"categories"`
+	Paging paging.Paging `json:"paging"`
+}
+
+type ListCategoriesResponse struct {
+	Categories []*Category        `json:"categories"`
+	Paging     *paging.PagingInfo `json:"paging"`
 }

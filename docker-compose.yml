@@ -24,7 +24,6 @@ services:
     restart: always
     volumes:
       - ./db:/docker-entrypoint-initdb.d/
-      -
   elasticsearch:
     build:
       context: elasticsearch/

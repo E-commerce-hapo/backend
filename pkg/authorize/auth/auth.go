@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/casbin/casbin/v2/model"
-	"github.com/kiem-toan/infrastructure/authorize/adapter"
+	"github.com/kiem-toan/pkg/authorize/adapter"
 
 	"github.com/casbin/casbin/v2"
 )
@@ -15,7 +15,6 @@ type Policy string
 
 type Authorizer struct {
 	*casbin.Enforcer
-
 	mapRoleAndActions map[string][]string
 }
 
@@ -29,15 +28,17 @@ func New() *Authorizer {
 	}
 }
 
+// (Ex:
+//	roles: ["admin", "shipper"]
+//	action: "/CreateProduct:POST"
+// )
 func (a *Authorizer) Check(roles Roles, action string) bool {
 	for _, role := range roles {
 		res, err := a.Enforcer.Enforce(action, role)
 		if err != nil {
 			return false
 		}
-		if res {
-			return true
-		}
+		return res
 	}
 	return false
 }
@@ -45,6 +46,16 @@ func (a *Authorizer) Check(roles Roles, action string) bool {
 func buildMapRoleActions(policy string) map[string][]string {
 	lines := strings.Split(policy, "\n")
 	checkedActions := map[string]struct{}{}
+
+	// (Ex: m := make(map[string][]string)
+	//		"admin": []string {
+	// 			"/api/GetProduct:post"
+	//			"/api/CreateProduct:post"
+	//		},
+	//		"shipper": []string {
+	// 			"/api/GetProducts:post"
+	//		}
+	// )
 	m := make(map[string][]string) // map role and actions
 	for _, line := range lines {
 		// prefix '#' for comment
@@ -53,9 +64,9 @@ func buildMapRoleActions(policy string) map[string][]string {
 			continue
 		}
 
-		// p, readAndWriteBook, me, you => ["p",    "readAndWriteBook", "me", "you"]
-		//                                   ^              ^                ^
-		//                                 prefix         action          roles......
+		// p, /api/CreateProduct:POST, admin, shipper => ["p",    "/api/CreateProduct:POST", "admin", "shipper"]
+		//                                                 ^              	   ^                	^
+		//                                               prefix         	 action          	  roles......
 		elements := strings.Split(line, ",")
 		if len(elements) < 3 {
 			panic(fmt.Sprintf("Invalid policy setup, error line content: %v", line))

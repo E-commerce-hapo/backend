@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/k0kubun/pp"
-	"github.com/kiem-toan/infrastructure/authorize/auth"
+	"github.com/kiem-toan/pkg/authorize/auth"
 )
 
 func main() {

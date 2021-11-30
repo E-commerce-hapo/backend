@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/kiem-toan/infrastructure/common/cm_array"
-	"github.com/kiem-toan/infrastructure/errorx"
+	"github.com/kiem-toan/pkg/common/cm_array"
+	"github.com/kiem-toan/pkg/errorx"
 )
 
 type Paging struct {
@@ -35,13 +35,13 @@ func (p *Paging) Validate(model interface{}) error {
 			lowerSort := strings.ToLower(sort)             // created_at desc
 			lowerSortStrs := strings.Split(lowerSort, " ") // ["created_at", "desc"]
 			if len(lowerSortStrs) != 2 {
-				return errorx.New(http.StatusBadRequest, nil, "Sort does not valid")
+				return errorx.Errorf(http.StatusBadRequest, nil, "Sort does not valid")
 			}
 			sortField := lowerSortStrs[0]                             // "created_at"
 			normalizedField := strings.ReplaceAll(sortField, "_", "") // createdat
 			isContained := cm_array.ListStringsContain(normalizedColumns, normalizedField)
 			if !isContained {
-				return errorx.New(http.StatusBadRequest, nil, fmt.Sprintf("Sorted field %v does not exist in table", normalizedField))
+				return errorx.Errorf(http.StatusBadRequest, nil, fmt.Sprintf("Sorted field %v does not exist in table", normalizedField))
 			}
 		}
 	}

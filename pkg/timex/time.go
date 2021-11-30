@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/kiem-toan/infrastructure/jsonx"
+	"github.com/kiem-toan/pkg/jsonx"
 )
 
 // TimeAsMillis ...

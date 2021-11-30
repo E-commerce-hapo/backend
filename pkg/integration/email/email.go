@@ -3,14 +3,13 @@ package email
 import (
 	"context"
 	"crypto/tls"
-	"encoding/base64"
 	"fmt"
 	"net/http"
 	"net/smtp"
 
 	"github.com/k0kubun/pp"
 
-	"github.com/kiem-toan/infrastructure/errorx"
+	"github.com/kiem-toan/pkg/errorx"
 )
 
 type SMTPConfig struct {
@@ -100,13 +99,13 @@ func (c *Client) Dial() (*smtp.Client, error) {
 		return client, err
 
 	default:
-		return nil, errorx.New(http.StatusInternalServerError, nil, "Unknown encryption: %v", encrypt)
+		return nil, errorx.Errorf(http.StatusInternalServerError, nil, "Unknown encryption: %v", encrypt)
 	}
 }
 
 func (c *Client) SendMail(ctx context.Context, cmd *SendEmailCommand) error {
 	if len(cmd.ToAddresses) == 0 {
-		return errorx.New(http.StatusInternalServerError, nil, "Missing email address")
+		return errorx.Errorf(http.StatusInternalServerError, nil, "Missing email address")
 	}
 
 	addrs := make([]string, len(cmd.ToAddresses))
@@ -117,7 +116,7 @@ func (c *Client) SendMail(ctx context.Context, cmd *SendEmailCommand) error {
 	err := c.sendMail(ctx, addrs, cmd)
 	pp.Println(cmd, addrs, err)
 	if err != nil {
-		return errorx.New(http.StatusInternalServerError, err, "Không thể gửi email đến địa chỉ %v (%v). Nếu cần thêm thông tin, vui lòng liên hệ %v.")
+		return errorx.Errorf(http.StatusInternalServerError, err, "Không thể gửi email đến địa chỉ %v (%v). Nếu cần thêm thông tin, vui lòng liên hệ %v.")
 
 	}
 	return nil
@@ -138,42 +137,42 @@ func (c *Client) sendMail(ctx context.Context, addresses []string, cmd *SendEmai
 		return err
 	}
 
-	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	subject := "=?utf-8?B?" + base64.StdEncoding.EncodeToString([]byte(cmd.Subject)) + "?="
-
-	var errs errorx.Errors
-	for _, email := range addresses {
-		msg := []byte(fmt.Sprintf(
-			"From: %s <%s> \r\nTo: %s\r\nSubject: %s\r\n%s\r\n\r\n%s\r\n",
-			cmd.FromName, c.cfg.FromAddress, email, subject, mime, cmd.Content))
-
-		err = client.Mail(c.cfg.FromAddress)
-		if err != nil {
-			errs = append(errs, err)
-			continue
-		}
-		err = client.Rcpt(email)
-		if err != nil {
-			errs = append(errs, err)
-			continue
-		}
-		d, err := client.Data()
-		if err != nil {
-			errs = append(errs, err)
-			continue
-		}
-		if _, err := d.Write(msg); err != nil {
-			errs = append(errs, err)
-			continue
-		}
-		err = d.Close()
-		if err != nil {
-			errs = append(errs, err)
-			continue
-		}
-	}
-	if len(errs) > 0 {
-		fmt.Errorf("Can not send email", err)
-	}
-	return errs.Any()
+	//mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+	//subject := "=?utf-8?B?" + base64.StdEncoding.EncodeToString([]byte(cmd.Subject)) + "?="
+	return nil
+	//var errs errorx.Errors
+	//for _, email := range addresses {
+	//	msg := []byte(fmt.Sprintf(
+	//		"From: %s <%s> \r\nTo: %s\r\nSubject: %s\r\n%s\r\n\r\n%s\r\n",
+	//		cmd.FromName, c.cfg.FromAddress, email, subject, mime, cmd.Content))
+	//
+	//	err = client.Mail(c.cfg.FromAddress)
+	//	if err != nil {
+	//		errs = append(errs, err)
+	//		continue
+	//	}
+	//	err = client.Rcpt(email)
+	//	if err != nil {
+	//		errs = append(errs, err)
+	//		continue
+	//	}
+	//	d, err := client.Data()
+	//	if err != nil {
+	//		errs = append(errs, err)
+	//		continue
+	//	}
+	//	if _, err := d.Write(msg); err != nil {
+	//		errs = append(errs, err)
+	//		continue
+	//	}
+	//	err = d.Close()
+	//	if err != nil {
+	//		errs = append(errs, err)
+	//		continue
+	//	}
+	//}
+	//if len(errs) > 0 {
+	//	fmt.Errorf("Can not send email", err)
+	//}
+	//return errs.Any()
 }

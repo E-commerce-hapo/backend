@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/kiem-toan/domain/enums/order_direction"
-	"github.com/kiem-toan/infrastructure/errorx"
+	"github.com/kiem-toan/pkg/errorx"
 
 	service_common "github.com/kiem-toan/domain/service/common"
 )
@@ -45,11 +45,11 @@ func (p *Paging) Convert_api_Paging_to_service_Paging() (*service_common.Paging,
 	for _, s := range p.Sort {
 		splitedSortStrs := strings.Split(s, " ")
 		if len(splitedSortStrs) != 2 {
-			return nil, errorx.New(http.StatusBadRequest, nil, "Sort does not valid")
+			return nil, errorx.Errorf(http.StatusBadRequest, nil, "Sort does not valid")
 		}
 		orderDirection := order_direction.OrderDirection(strings.Split(s, " ")[1])
 		if orderDirection != order_direction.Asc && orderDirection != order_direction.Desc {
-			return nil, errorx.New(http.StatusBadRequest, nil, "Sort direction does not valid (enum: asc, desc)")
+			return nil, errorx.Errorf(http.StatusBadRequest, nil, "Sort direction does not valid (enum: asc, desc)")
 		}
 	}
 	return &service_common.Paging{

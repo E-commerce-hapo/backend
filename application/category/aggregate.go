@@ -2,13 +2,10 @@ package category
 
 import (
 	"context"
-	"time"
 
-	"github.com/k0kubun/pp"
+	"github.com/kiem-toan/pkg/integration/email"
 
-	"github.com/kiem-toan/infrastructure/integration/email"
-
-	"github.com/kiem-toan/infrastructure/event/dispatcher"
+	"github.com/kiem-toan/pkg/event/dispatcher"
 
 	"github.com/kiem-toan/pkg/idx"
 
@@ -48,21 +45,6 @@ func (c *CategoryAggregate) CreateCategory(ctx context.Context, args *service_ca
 		ShopID:      args.ShopID,
 	}
 	if err := c.categoryStore(ctx).CreateCategory(ctx, category); err != nil {
-		return err
-	}
-	event := service_category.CreatedCategoryEvent{
-		Time: time.Now().UTC(),
-		ID:   "111",
-	}
-	err := c.dispatcher.Dispatch(event)
-	c.emailClient.SendMail(ctx, &email.SendEmailCommand{
-		FromName:    "shinichi24567@gmail.com",
-		ToAddresses: []string{"1751012015hai@ou.edu.vn"},
-		Subject:     "subject",
-		Content:     "abcc121",
-	})
-	if err != nil {
-		pp.Println(err)
 		return err
 	}
 	return nil

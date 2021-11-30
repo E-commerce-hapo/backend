@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/kiem-toan/infrastructure/errorx"
+	"github.com/kiem-toan/pkg/errorx"
 
-	"github.com/kiem-toan/infrastructure/event/listener"
+	"github.com/kiem-toan/pkg/event/listener"
 )
 
 // Như là 1 nhà điều phối event
@@ -37,11 +37,7 @@ func (d *Dispatcher) AddEventListner(eventListener listener.Listener, event inte
 func (d *Dispatcher) Dispatch(event interface{}) error {
 	eventType := reflect.TypeOf(event)
 	if _, ok := d.events[eventType]; !ok {
-		return &errorx.Errorx{
-			StatusCode: http.StatusInternalServerError,
-			Err:        nil,
-			Msg:        fmt.Sprintf("The '%s' event is not registered", eventType.String()),
-		}
+		return errorx.Errorf(http.StatusInternalServerError, nil, fmt.Sprintf("The '%s' event is not registered", eventType.String()))
 	}
 	listens := d.events[eventType]
 	for _, listen := range listens {

@@ -1,14 +1,15 @@
 package auth
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
-	"github.com/kiem-toan/infrastructure/authorize/auth"
+	"github.com/kiem-toan/pkg/httpx"
 
-	"github.com/kiem-toan/infrastructure/errorx"
+	"github.com/kiem-toan/pkg/authorize/auth"
 
-	"github.com/gin-gonic/gin"
+	"github.com/kiem-toan/pkg/errorx"
 )
 
 func CORS(next http.Handler) http.HandlerFunc {
@@ -46,35 +47,35 @@ func CORS(next http.Handler) http.HandlerFunc {
 	}
 }
 
-func TokenAuthMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		//err := TokenValid(c.Request)
-		//if err != nil {
-		//	c.JSON(http.StatusUnauthorized, err)
-		//	c.Abort()
-		//	return
-		//}
-		//claims, err := ExtractTokenMetaData(c.Request)
-		//_err, _ := err.(*errorx.Errorx)
-		//if err != nil {
-		//	pp.Println(claims)
-		//	c.JSON(_err.StatusCode, _err)
-		//	c.Abort()
-		//	return
-		//}
+func TokenAuthMiddleware(next http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		err := ValidateToken(r)
+		if err != nil {
+			httpx.WriteError(ctx, w, err)
+			return
+		}
+		claims, err := GetCustomClaimsFromRequest(r)
+		if err != nil {
+			httpx.WriteError(ctx, w, err)
+			return
+		}
 		// TODO: Get user info and pass into SessionInfo
-		rolesAfterGetFromDB := auth.Roles{"admin", "accountant"}
-		urlFromRequest := "GetProduct"
-		methodFromRequest := "post"
+		rolesAfterGetFromDB := auth.Roles{"admin", "shipper"}
+		urlFromRequest := r.RequestURI
+		methodFromRequest := r.Method
 		action := strings.Join([]string{urlFromRequest, methodFromRequest}, ":")
 		e := auth.New()
 
-		if e.Check(rolesAfterGetFromDB, action) {
-			c.JSON(http.StatusUnauthorized, errorx.New(http.StatusUnauthorized, nil, "Không tìm thấy hoặc cần quyền truy cập.."))
+		if !e.Check(rolesAfterGetFromDB, action) {
+			httpx.WriteError(ctx, w, errorx.Errorf(http.StatusUnauthorized, nil, "Không tìm thấy hoặc cần quyền truy cập."))
 			return
 		}
-		var sessionInfo *SessionInfo
-		c.Set("SS", sessionInfo)
-		c.Next()
+		sessionInfo := &SessionInfo{}
+		if claims != nil {
+			sessionInfo.UserID = claims.UserID
+		}
+		ctx = context.WithValue(ctx, "ss", sessionInfo)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 }

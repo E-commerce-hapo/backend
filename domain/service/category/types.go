@@ -5,7 +5,7 @@ import (
 
 	"github.com/kiem-toan/domain/service/common"
 
-	"github.com/kiem-toan/infrastructure/idx"
+	"github.com/kiem-toan/pkg/idx"
 )
 
 type Category struct {

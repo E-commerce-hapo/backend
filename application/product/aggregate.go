@@ -4,7 +4,7 @@ import (
 	"context"
 
 	service_category "github.com/kiem-toan/domain/service/product"
-	"github.com/kiem-toan/infrastructure/event/dispatcher"
+	"github.com/kiem-toan/pkg/event/dispatcher"
 )
 
 type ProductAggregate struct {

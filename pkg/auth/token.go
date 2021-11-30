@@ -7,11 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kiem-toan/infrastructure/errorx"
-
 	"github.com/dgrijalva/jwt-go"
 
-	"github.com/kiem-toan/infrastructure/idx"
+	"github.com/kiem-toan/pkg/errorx"
+	"github.com/kiem-toan/pkg/idx"
 )
 
 const (
@@ -38,61 +37,65 @@ type JWTCustomClaims struct {
 }
 
 func GenerateToken(userID idx.ID) (*TokenDetails, error) {
-	td := &TokenDetails{}
-
 	var err error
 	//Creating Access Token
-	td.AtExpires = time.Now().Add(time.Minute * TokenExpiresDuration).Unix()
+	atExpires := time.Now().Add(time.Minute * TokenExpiresDuration).Unix()
 	atClaims := &JWTCustomClaims{
 		UserID: userID,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: td.AtExpires,
+			ExpiresAt: atExpires,
 		},
 	}
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
-	td.AccessToken, err = at.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
+	accessToken, err := at.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
 	if err != nil {
 		return nil, err
 	}
 
 	//Creating Refresh Token
-	td.RtExpires = time.Now().Add(time.Minute * RefreshTokenExpiresDuration).Unix()
+	rtExpires := time.Now().Add(time.Minute * RefreshTokenExpiresDuration).Unix()
 	rtClaims := &JWTCustomClaims{
 		UserID: userID,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: td.RtExpires,
+			ExpiresAt: rtExpires,
 		},
 	}
 	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, rtClaims)
-	td.RefreshToken, err = rt.SignedString([]byte(os.Getenv("REFRESH_SECRET")))
+	refreshToken, err := rt.SignedString([]byte(os.Getenv("REFRESH_SECRET")))
 	if err != nil {
 		return nil, err
 	}
-	return td, nil
+	return &TokenDetails{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		AtExpires:    atExpires,
+		RtExpires:    rtExpires,
+	}, nil
 }
 
-func extractToken(r *http.Request) (string, error) {
-	s := r.Header.Get(AuthorizationHeader)
+// Get token string from Authorization Header (Ex: Bearer bncdyfcg812h3ndsya8dg68sd12...)
+func getTokenStrFromHeader(header http.Header) (string, error) {
+	s := header.Get(AuthorizationHeader)
 	if s == "" {
-		return "", errorx.New(http.StatusUnauthorized, nil, "Missing authorization string")
+		return "", errorx.Errorf(http.StatusUnauthorized, nil, "Missing authorization string")
 	}
 	splits := strings.SplitN(s, " ", 2)
 	if len(splits) < 2 {
-		return "", errorx.New(http.StatusUnauthorized, nil, "Bad authorization string")
+		return "", errorx.Errorf(http.StatusUnauthorized, nil, "Bad authorization string")
 	}
-	if splits[0] != AuthorizationScheme && splits[0] != AuthorizationScheme {
-		return "", errorx.New(http.StatusUnauthorized, nil, "Request unauthenticated with "+AuthorizationScheme)
+	if splits[0] != AuthorizationScheme {
+		return "", errorx.Errorf(http.StatusUnauthorized, nil, "Request unauthenticated with "+AuthorizationScheme)
 	}
 	return splits[1], nil
 }
 
-func verifyToken(r *http.Request) (*jwt.Token, error) {
-	tokenString, err := extractToken(r)
+func getTokenFromRequest(r *http.Request) (*jwt.Token, error) {
+	tokenStr, err := getTokenStrFromHeader(r.Header)
 	if err != nil {
 		return nil, err
 	}
 	atClaims := &JWTCustomClaims{}
-	token, err := jwt.ParseWithClaims(tokenString, atClaims, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenStr, atClaims, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
@@ -101,35 +104,35 @@ func verifyToken(r *http.Request) (*jwt.Token, error) {
 	if err != nil {
 		if ve, ok := err.(*jwt.ValidationError); ok {
 			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
-				return nil, errorx.New(http.StatusUnauthorized, nil, "ValidationErrorMalformed")
+				return nil, errorx.Errorf(http.StatusUnauthorized, nil, "Validation Error Malformed")
 			} else if ve.Errors&jwt.ValidationErrorExpired != 0 {
 				// Token is expired
-				return nil, errorx.New(http.StatusUnauthorized, nil, "Token have already expried")
+				return nil, errorx.Errorf(http.StatusUnauthorized, nil, "Token have already expried")
 			} else if ve.Errors&jwt.ValidationErrorNotValidYet != 0 {
-				return nil, errorx.New(http.StatusUnauthorized, nil, "ValidationErrorNotValidYet")
+				return nil, errorx.Errorf(http.StatusUnauthorized, nil, "Validation Error Not Valid Yet")
 			} else {
-				return nil, errorx.New(http.StatusUnauthorized, nil, "TokenInvalid")
+				return nil, errorx.Errorf(http.StatusUnauthorized, nil, "Token Invalid")
 			}
 		}
 	}
-	//if time.Now().Unix() > atClaims.ExpiresAt {
-	//	return nil, errorx.New(http.StatusUnauthorized, nil, "Token have already expried")
-	//}
+	if time.Now().Unix() > atClaims.ExpiresAt {
+		return nil, errorx.Errorf(http.StatusUnauthorized, nil, "Token have already expried")
+	}
 	if err != nil {
 		return nil, err
 	}
 	return token, nil
 }
 
-func ExtractTokenMetaData(r *http.Request) (*JWTCustomClaims, error) {
-	token, err := verifyToken(r)
+func GetCustomClaimsFromRequest(r *http.Request) (*JWTCustomClaims, error) {
+	token, err := getTokenFromRequest(r)
 	if err != nil {
-		return nil, errorx.New(http.StatusUnauthorized, err, "Can not verify token. Token does not valid")
+		return nil, errorx.Errorf(http.StatusUnauthorized, err, "Can not verify token. Token does not valid")
 	}
 
-	cl, ok := token.Claims.(*JWTCustomClaims)
+	claim, ok := token.Claims.(*JWTCustomClaims)
 	if ok && token.Valid {
-		return cl, nil
+		return claim, nil
 	}
 	return nil, nil
 }
@@ -146,30 +149,31 @@ func RefreshToken(refreshToken string) (*TokenDetails, error) {
 
 	// If there is an error, the token must have expired
 	if err != nil {
-		return nil, errorx.New(http.StatusUnauthorized, nil, "Refresh token expired")
+		return nil, errorx.Errorf(http.StatusUnauthorized, nil, "Refresh token expired")
 	}
 
 	// Check token valid
 	if _, ok := token.Claims.(JWTCustomClaims); !ok || !token.Valid {
-		return nil, errorx.New(http.StatusUnauthorized, err, "Refresh token does not valid")
+		return nil, errorx.Errorf(http.StatusUnauthorized, err, "Refresh token does not valid")
 	}
 
 	// Generate new tokens
 	customClaims, _ = token.Claims.(JWTCustomClaims)
 	userID := customClaims.UserID
 	if userID == 0 {
-		return nil, errorx.New(http.StatusUnprocessableEntity, nil, "Unauthorized")
+		return nil, errorx.Errorf(http.StatusUnprocessableEntity, nil, "Unauthorized")
 	}
 
 	//Create new pairs of refresh and access tokens
 	ts, err := GenerateToken(userID)
 	if err != nil {
-		return nil, errorx.New(http.StatusForbidden, nil, err.Error())
+		return nil, errorx.Errorf(http.StatusForbidden, nil, err.Error())
 	}
 	return ts, nil
 }
-func TokenValid(r *http.Request) error {
-	token, err := verifyToken(r)
+
+func ValidateToken(r *http.Request) error {
+	token, err := getTokenFromRequest(r)
 	if err != nil {
 		return err
 	}
