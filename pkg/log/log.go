@@ -6,11 +6,8 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/kiem-toan/pkg/config"
-
 	logrustash "github.com/bshuster-repo/logrus-logstash-hook"
 	"github.com/openzipkin/zipkin-go"
-	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -39,21 +36,23 @@ func SetLoglevel(level string) {
 	}
 }
 
-func RegisterLogStash() {
-	SetLoglevel("info")
-	logst := logrus.New()
-	conn, err := net.Dial("tcp", config.GetAppConfig().LogStash.IP+`:`+config.GetAppConfig().LogStash.Port)
-	if err != nil {
-		Fatal(err, nil, nil)
-	}
-	hook := logrustash.New(conn, &log.TextFormatter{
+func RegisterLogStash(logstashIP, logstashPort, applicationName string) {
+	log.SetFormatter(&log.TextFormatter{
 		TimestampFormat: "02-01-2006 15:04:05",
 		FullTimestamp:   true,
 	})
-	logst.Hooks.Add(hook)
+	SetLoglevel("info")
+	connLogstash, err := net.Dial("tcp", logstashIP+`:`+logstashPort)
+	if err != nil {
+		Fatal(err, nil, nil)
+	}
+
+	hook, err := logrustash.NewHookWithConn(connLogstash, applicationName)
+	if err != nil {
+		Fatal(err, nil, nil)
+	}
 	log.AddHook(hook)
 }
-
 func Trace(err error, span zipkin.Span, fields map[string]interface{}) {
 	if err != nil {
 		logFields := getLogFields(span, fields)

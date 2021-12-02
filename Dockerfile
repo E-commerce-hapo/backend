@@ -16,7 +16,10 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN go build -o main ./cmd/audit-server
+
+RUN go get -v -u github.com/swaggo/swag/cmd/swag
+RUN swag init
+RUN go build -o main ./
 RUN rm -rf /tmp/*
 
 # Expose port 8080 to the outside world

@@ -5,6 +5,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/kiem-toan/pkg/config"
+	"github.com/kiem-toan/pkg/env"
+
 	"github.com/kiem-toan/pkg/httpx"
 
 	"github.com/kiem-toan/pkg/authorize/auth"
@@ -16,19 +19,18 @@ func CORS(next http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("origin")
 		switch {
-		case
+		case config.GetAppConfig().Env == env.EnvDev,
 			origin == "ionic://localhost",
 			origin == "capacitor://localhost",
 			origin == "http://localhost",
 			origin == "http://localhost:8080",
-			origin == "http://localhost:8100",
-			strings.HasSuffix(origin, ".d.etop.vn"):
+			origin == "http://localhost:8100":
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 
-		//case cmenv.IsSandBox(), cmenv.IsDevOrStag():
-		//	w.Header().Set("Access-Control-Allow-Origin", "*")
-		//
-		//case cmenv.IsProd():
+		case config.GetAppConfig().Env == env.EnvStaging:
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+
+		case config.GetAppConfig().Env == env.EnvProd:
 
 		default:
 			next.ServeHTTP(w, r)

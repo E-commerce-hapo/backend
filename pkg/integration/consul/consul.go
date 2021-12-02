@@ -101,20 +101,15 @@ func (c *Client) RegisterServiceWatcher(key string, value string) (watcher *watc
 	return watcher, nil
 }
 
-func RegisterConsulWatcher(cfgCh chan config.Config) *watch.Plan {
-	consulClient, err := New(&Config{
-		ApplicationName: os.Getenv("APPLICATION_NAME"),
-		//ConsulAclToken:  os.Getenv("CONSUL_ACL_TOKEN"),
-		ConsulIP:   os.Getenv("CONSUL_PORT"),
-		ConsulPort: os.Getenv("CONSUL_IP"),
-	})
+func RegisterConsulWatcher(cfgCh chan config.Config, cfg *Config) *watch.Plan {
+	consulClient, err := New(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 	// Đăng ký một watcher - watcher này sẽ ngóng sự thay đổi từ consul server
 	// khi có một sự thay đổi thì nó sẽ báo về cho consul client
-	pp.Println(strings.TrimPrefix(`config/`+os.Getenv("APPLICATION_NAME")+`/data`, "/"))
-	watcher, err := consulClient.RegisterWatcher("key", strings.TrimPrefix(`config/`+os.Getenv("APPLICATION_NAME")+`/data`, "/"))
+	pp.Println(strings.TrimPrefix(`config/`+cfg.ApplicationName+`/data`, "/"))
+	watcher, err := consulClient.RegisterWatcher("key", strings.TrimPrefix(`config/`+cfg.ApplicationName+`/data`, "/"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -123,16 +118,16 @@ func RegisterConsulWatcher(cfgCh chan config.Config) *watch.Plan {
 	watcher.Handler = func(index uint64, data interface{}) {
 		// Khi consul server thay đổi cặp key/value thì lấy lại giá trị value mới, đồng thời cập nhật lại channel cfgCh
 		if pair, ok := data.(*consulAPI.KVPair); ok {
-			var cfg config.Config
-			err = json.Unmarshal(pair.Value, &cfg)
+			var config config.Config
+			err = json.Unmarshal(pair.Value, &config)
 			if err != nil {
 				log.Fatal(err)
 			}
-			cfg.ApplicationName = os.Getenv("APPLICATION_NAME")
-			cfg.Consul.Port = os.Getenv("CONSUL_PORT")
-			cfg.Consul.IP = os.Getenv("CONSUL_IP")
-			cfg.Consul.ACLToken = os.Getenv("CONSUL_ACL_TOKEN")
-			cfgCh <- cfg
+			config.ApplicationName = os.Getenv("APPLICATION_NAME")
+			config.Consul.Port = os.Getenv("CONSUL_PORT")
+			config.Consul.IP = os.Getenv("CONSUL_IP")
+			config.Consul.ACLToken = os.Getenv("CONSUL_ACL_TOKEN")
+			cfgCh <- config
 		}
 	}
 	go func() {

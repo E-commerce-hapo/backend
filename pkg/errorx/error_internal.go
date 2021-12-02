@@ -62,7 +62,7 @@ func newInternalError(code int, message string, err error) *internalError {
 	}
 
 	// Always include the original location
-	_, file, line, _ := runtime.Caller(3)
+	_, file, line, _ := runtime.Caller(2)
 	xerr := &internalError{
 		Err:      err,
 		Code:     code,

@@ -25,22 +25,36 @@ import (
 func init() {
 	gotenv.Load()
 	env.SetEnvironment(os.Getenv("ENV"))
+	go log2.RegisterLogStash(os.Getenv("LOGSTASH_IP"), os.Getenv("LOGSTASH_PORT"), os.Getenv("APPLICATION_NAME"))
 }
 
+// @title          Swagger E-Commerce HAPO GoLang API
+// @version        1.0
+// @description    Bộ API của sàn thương mại điện tử
+// @contact.name   Nguyễn Văn Kim Hải
+// @contact.url    https://mafc.com.vn/
+// @contact.email  kimhai.ngvan@gmail.com
+// @license.name   HAPO
+// @host           localhost:8080
 func main() {
 	var cfgCh = make(chan config.Config, 1)
-	watcher := consul.RegisterConsulWatcher(cfgCh)
+	watcher := consul.RegisterConsulWatcher(cfgCh, &consul.Config{
+		ApplicationName: os.Getenv("APPLICATION_NAME"),
+		ConsulAclToken:  os.Getenv("CONSUL_ACL_TOKEN"),
+		ConsulIP:        os.Getenv("CONSUL_IP"),
+		ConsulPort:      os.Getenv("CONSUL_PORT"),
+	})
 	defer watcher.Stop()
 
 	var s *http.Server
 	for {
 		cfg := <-cfgCh
+		cfg.ProjectDir, _ = os.Getwd()
 		go func() {
 			config.SetAppConfig(&cfg)
-			go log2.RegisterLogStash()
+			go log2.RegisterLogStash(os.Getenv("LOGSTASH_IP"), os.Getenv("LOGSTASH_PORT"), os.Getenv("APPLICATION_NAME"))
 			log2.SetLoglevel(config.GetAppConfig().Log.Level)
 			cfg.Info()
-
 			app, err := build.InitApp(cfg)
 			if err != nil {
 				panic(err)

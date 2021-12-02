@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/k0kubun/pp"
 
@@ -18,6 +19,7 @@ var (
 
 // App Config ...
 type Config struct {
+	ProjectDir      string
 	ApplicationName string      `json:"application_name"`
 	Databases       DBConfig    `json:"databases"`
 	Log             Log         `json:"log"`
@@ -78,6 +80,37 @@ func SetAppConfig(cfg *Config) {
 func (c *Config) Info() {
 	fmt.Println("Thông số biến môi trường:")
 	pp.Println(c)
+}
+
+func (c *Config) AssignEnv() {
+	if os.Getenv("APPLICATION_NAME") != "" {
+		c.ApplicationName = os.Getenv("APPLICATION_NAME")
+	}
+	if os.Getenv("CONSUL_IP") != "" {
+		c.Consul.IP = os.Getenv("CONSUL_IP")
+	}
+	if os.Getenv("CONSUL_PORT") != "" {
+		c.Consul.Port = os.Getenv("CONSUL_PORT")
+	}
+	if os.Getenv("CONSUL_ACL_TOKEN") != "" {
+		c.Consul.ACLToken = os.Getenv("CONSUL_ACL_TOKEN")
+	}
+
+	if os.Getenv("CONSUL_ACL_TOKEN") != "" {
+		c.Consul.ACLToken = os.Getenv("CONSUL_ACL_TOKEN")
+	}
+
+	if os.Getenv("CONSUL_ACL_TOKEN") != "" {
+		c.Consul.ACLToken = os.Getenv("CONSUL_ACL_TOKEN")
+	}
+
+	if os.Getenv("CONSUL_ACL_TOKEN") != "" {
+		c.Consul.ACLToken = os.Getenv("CONSUL_ACL_TOKEN")
+	}
+
+	if os.Getenv("CONSUL_ACL_TOKEN") != "" {
+		c.Consul.ACLToken = os.Getenv("CONSUL_ACL_TOKEN")
+	}
 }
 
 func DefaultConfig() *Config {

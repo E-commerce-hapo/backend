@@ -2,10 +2,10 @@ package category
 
 import "context"
 
-type CategoryAggrService interface {
+type ICategoryAggr interface {
 	CreateCategory(context.Context, *CreateCategoryArgs) error
 }
 
-type CategoryQueryService interface {
+type ICategoryQuery interface {
 	ListCategories(context.Context, *ListCategoriesArgs) ([]*Category, error)
 }

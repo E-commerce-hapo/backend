@@ -11,6 +11,7 @@ const (
 	Unknown  ApiType = 0
 	Internal ApiType = 1
 	Public   ApiType = 2
+	Swagger  ApiType = 3
 )
 
 type NullApiType struct {
@@ -22,12 +23,14 @@ var enumApiTypeName = map[int]string{
 	0: "unknown",
 	1: "internal",
 	2: "public",
+	3: "swagger",
 }
 
 var enumApiTypeValue = map[string]int{
 	"unknown":  0,
 	"internal": 1,
 	"public":   2,
+	"swagger":  3,
 }
 
 // GENERATE

@@ -1,0 +1,228 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Bộ API tạo token và validate Token OTP",
+        "title": "Swagger GoLang API",
+        "contact": {
+            "name": "Tiendc@mafc.com.vn",
+            "url": "https://mafc.com.vn/",
+            "email": "tiendc@mafc.com.vn"
+        },
+        "license": {
+            "name": "mafc"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "paths": {
+        "/hotp": {
+            "post": {
+                "description": "Tạo thông tin HOTP token dựa trên serect key",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Tạo OTP",
+                "parameters": [
+                    {
+                        "description": "Request GenerateOTP",
+                        "name": "GenerateOTP",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.GenerateOtpRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.OtpResponseWithToken"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.OtpResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/notification": {
+            "post": {
+                "description": "Tạo OTP và sent tới khách hàng",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Tạo OTP và sent tới khách hàng",
+                "parameters": [
+                    {
+                        "description": "TotpGenerateAndSend Request",
+                        "name": "TotpGenerateAndSend",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.HotpAndSendRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.OtpResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.OtpResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/validation": {
+            "post": {
+                "description": "Xác thực OTP Token đầu vào",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Xác thực OTP token",
+                "parameters": [
+                    {
+                        "description": "ValidateOTP Request",
+                        "name": "ValidateOTP",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ValidateOtpRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.OtpResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.OtpResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.GenerateOtpRequest": {
+            "type": "object",
+            "required": [
+                "channel",
+                "sendto"
+            ],
+            "properties": {
+                "channel": {
+                    "type": "string"
+                },
+                "sendto": {
+                    "type": "string"
+                },
+                "transactionId": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.HotpAndSendRequest": {
+            "type": "object",
+            "required": [
+                "templateId"
+            ],
+            "properties": {
+                "channel": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "sendTo": {
+                    "type": "string"
+                },
+                "templateId": {
+                    "type": "string"
+                },
+                "transactionId": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "useTemplate": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.OtpResponse": {
+            "type": "object",
+            "properties": {
+                "errorcode": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.OtpResponseWithToken": {
+            "type": "object",
+            "properties": {
+                "errorcode": {
+                    "type": "string"
+                },
+                "expireTime": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "otp": {
+                    "type": "string"
+                },
+                "otpSeq": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.ValidateOtpRequest": {
+            "type": "object",
+            "required": [
+                "otp",
+                "sendto"
+            ],
+            "properties": {
+                "otp": {
+                    "type": "string"
+                },
+                "sendto": {
+                    "type": "string"
+                },
+                "transactionId": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

@@ -21,6 +21,14 @@ func New(categorySvc *category.CategoryService) *CategoryHandler {
 	}
 }
 
+// @Tags 		 Category
+// @Summary      Create Category
+// @Description  Tạo danh mục (Category) từ thông tin client gửi lên
+// @Accept       json
+// @Produce      json
+// @Param        CreateCategory  body      category2.CreateCategoryRequest  true  "Request CreateCategory"
+// @Success      200          {object}  httpx.CreatedResponse
+// @Router       /api/CreateCategory [post]
 func (h *CategoryHandler) CreateCategoryHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	var t *category2.CreateCategoryRequest

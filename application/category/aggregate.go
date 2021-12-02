@@ -21,7 +21,7 @@ type CategoryAggregate struct {
 	emailClient   *email.Client
 }
 
-var _ service_category.CategoryAggrService = &CategoryAggregate{}
+var _ service_category.ICategoryAggr = &CategoryAggregate{}
 
 func NewCategoryAggregate(db *database.Database, dispatcher *dispatcher.Dispatcher, emailClient *email.Client) *CategoryAggregate {
 	//productPM *pm.ProductManager

@@ -12,7 +12,7 @@ type CategoryQuery struct {
 	categoryStore sqlstore.CategoryStoreFactory
 }
 
-var _ service_category.CategoryQueryService = &CategoryQuery{}
+var _ service_category.ICategoryQuery = &CategoryQuery{}
 
 func NewCategoryQuery(db *database.Database) *CategoryQuery {
 	return &CategoryQuery{

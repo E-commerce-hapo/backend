@@ -3,6 +3,8 @@ package _interface
 import (
 	"net/http"
 
+	"github.com/kiem-toan/pkg/doc/swagger"
+
 	"github.com/kiem-toan/domain/enums/api_type"
 
 	"github.com/kiem-toan/pkg/auth"
@@ -20,26 +22,31 @@ type Route struct {
 
 func NewRouter(routes []Route) *mux.Router {
 	router := mux.NewRouter()
-	// TODO: Swagger, finish later
-	//opts := middleware.RedocOpts{SpecURL: "/swagger.json"}
-	//sh := middleware.Redoc(opts, nil)
-	//router.Handle("/docs", sh).Methods(http.MethodGet)
-	//router.Handle("/swagger.json", http.FileServer(http.Dir("./")))
 
-	router = router.PathPrefix("/api").Subrouter()
-	router.Use()
+	swaggerRouter := router.PathPrefix("/docs").Subrouter()
+	internalAPIRouter := router.PathPrefix("/api").Subrouter()
+	publicAPIRouter := router.PathPrefix("/").Subrouter()
+
 	for _, route := range routes {
-		handleFnc := route.HandlerFunc
-		if route.Type == api_type.Internal {
+		handleFnc := auth.CORS(route.HandlerFunc)
+		switch route.Type {
+		case api_type.Swagger:
+			swaggerRouter.Handle(route.Path, handleFnc).Methods(route.Method)
+		case api_type.Internal:
 			handleFnc = auth.TokenAuthMiddleware(route.HandlerFunc)
+			internalAPIRouter.Handle(route.Path, handleFnc).Methods(route.Method)
+		case api_type.Public:
+			publicAPIRouter.Handle(route.Path, handleFnc).Methods(route.Method)
 		}
-		router.Handle(route.Path, handleFnc).Methods(route.Method)
 	}
 	return router
 }
 
 func AllRoutes(app *build.App) []Route {
-	routes := []Route{
+	internalRoutes := []Route{
+		// SWAGGER
+		{"/", swagger.RedocHandler(), http.MethodGet, api_type.Swagger},
+		{"/swagger.json", swagger.SwaggerHandler("/swagger.json"), http.MethodGet, api_type.Swagger},
 		// CATEGORY
 		{"/CreateCategory", app.CategoryHandler.CreateCategoryHandler, http.MethodPost, api_type.Internal},
 		{"/ListCategories", app.CategoryHandler.ListCategoriesHandler, http.MethodPost, api_type.Internal},
@@ -48,5 +55,5 @@ func AllRoutes(app *build.App) []Route {
 		{"/GetTokenData", app.CategoryHandler.GetTokenDataHandler, http.MethodPost, api_type.Internal},
 		{"/RefreshToken", app.CategoryHandler.GetTokenDataHandler, http.MethodPost, api_type.Internal},
 	}
-	return routes
+	return internalRoutes
 }

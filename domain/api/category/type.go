@@ -15,16 +15,20 @@ type Category struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 	CreatedAt   time.Time `json:"created_at"`
 }
+
 type CreateCategoryRequest struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
+	// ID tự gen ra ở server
+	ID string `json:"id"`
+	// Tên của danh mục, bắt buộc phải có
+	Name        string `json:"name" binding:"required"`
 	Description string `json:"description"`
+	URL         string `json:"url"`
 }
 
 // swagger:response CreateCategoryResponse
 type CreateCategoryResponse struct {
 	ID   string `json:"id"`
-	Name string `json:"name"`
+	Name string `json:"name "`
 }
 
 type ListCategoriesRequest struct {
