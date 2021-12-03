@@ -1,6 +1,24 @@
 package httpx
 
-import "github.com/kiem-toan/pkg/jsonx"
+import (
+	"net/http"
+
+	"github.com/kiem-toan/pkg/jsonx"
+)
+
+type loggingResponseWriter struct {
+	http.ResponseWriter
+	StatusCode int
+}
+
+func NewLoggingResponseWriter(w http.ResponseWriter) *loggingResponseWriter {
+	return &loggingResponseWriter{w, http.StatusOK}
+}
+
+func (lrw *loggingResponseWriter) WriteHeader(code int) {
+	lrw.StatusCode = code
+	lrw.ResponseWriter.WriteHeader(code)
+}
 
 type DeletedResponse struct {
 	Deleted int `json:"deleted"`

@@ -6,6 +6,8 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/k0kubun/pp"
+
 	logrustash "github.com/bshuster-repo/logrus-logstash-hook"
 	"github.com/openzipkin/zipkin-go"
 	log "github.com/sirupsen/logrus"
@@ -53,6 +55,7 @@ func RegisterLogStash(logstashIP, logstashPort, applicationName string) {
 	}
 	log.AddHook(hook)
 }
+
 func Trace(err error, span zipkin.Span, fields map[string]interface{}) {
 	if err != nil {
 		logFields := getLogFields(span, fields)
@@ -106,20 +109,22 @@ func getLogFields(span zipkin.Span, fields map[string]interface{}) log.Fields {
 
 	// Always include the original location
 	_, file, line, _ := runtime.Caller(2)
-	f["LocationFile"] = fmt.Sprintf("%v:%v", file, line)
+	f["location_file"] = fmt.Sprintf("%v:%v", file, line)
 
 	// Assign log fields
 	for k, v := range fields {
 		f[k] = v
 	}
 
+	pp.Println(span)
 	// Assign trace_id field
 	if span != nil {
 		if span.Context().ParentID == nil {
-			f["TraceID"] = span.Context().TraceID.String()
+			f["trace_id"] = span.Context().TraceID.String()
 		} else {
-			f["TraceID"] = span.Context().ParentID.String()
+			f["trace_id"] = span.Context().ParentID.String()
 		}
+		f["span_id"] = span.Context().ID
 	}
 
 	return f

@@ -2,12 +2,15 @@ package zipkin
 
 import (
 	"fmt"
+	"log"
+	"net/http"
 
-	"github.com/kiem-toan/pkg/config"
+	"github.com/kiem-toan/core/config"
 
 	"os"
 
 	"github.com/openzipkin/zipkin-go"
+	zipkinhttp "github.com/openzipkin/zipkin-go/middleware/http"
 	reporterhttp "github.com/openzipkin/zipkin-go/reporter/http"
 )
 
@@ -16,10 +19,10 @@ const (
 )
 
 func NewTracer() (*zipkin.Tracer, error) {
-	var endpointURL = "config.GetAppConfig().Zipkin.URL" + "/api/v2/spans"
+	var endpointURL = config.GetAppConfig().Zipkin.URL + "/api/v2/spans"
 	// The reporter sends traces to zipkin server
 	reporter := reporterhttp.NewReporter(endpointURL)
-	hostPort := fmt.Sprintf("%v:%v", host, config.Port)
+	hostPort := fmt.Sprintf("%v:%v", host, config.GetAppConfig().ServerPort)
 	localEndpoint, err := zipkin.NewEndpoint(os.Getenv("APPLICATION_NAME"), hostPort)
 	if err != nil {
 		return nil, err
@@ -37,6 +40,15 @@ func NewTracer() (*zipkin.Tracer, error) {
 	)
 	if err != nil {
 		return nil, err
+	}
+	// We add the instrumented transport to the defaultClient
+	// that comes with the zipkin-go library
+	http.DefaultClient.Transport, err = zipkinhttp.NewTransport(
+		t,
+		zipkinhttp.TransportTrace(true),
+	)
+	if err != nil {
+		log.Fatal(err, nil, nil)
 	}
 	return t, err
 }

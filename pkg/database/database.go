@@ -10,7 +10,7 @@ import (
 
 	log2 "github.com/kiem-toan/pkg/log"
 
-	"github.com/kiem-toan/pkg/config"
+	"github.com/kiem-toan/core/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

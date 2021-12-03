@@ -10,23 +10,24 @@ import (
 )
 
 const (
-	Port = 8080
+	ServerPort = "8080"
 )
 
 var (
-	appConfig = &Config{}
+	appConfig = Config{}
 )
 
 // App Config ...
 type Config struct {
 	ProjectDir      string
-	ApplicationName string      `json:"application_name"`
-	Databases       DBConfig    `json:"databases"`
-	Log             Log         `json:"log"`
-	LogStash        LogStash    `json:"log_stash"`
+	ApplicationName string
+	Databases       DBConfig `json:"databases"`
+	Log             Log      `json:"log"`
+	LogStash        LogStash
 	Zipkin          Zipkin      `json:"zipkin"`
 	Env             env.EnvType `json:"env"`
 	Consul          Consul      `json:"consul"`
+	ServerPort      string
 }
 
 type Consul struct {
@@ -69,12 +70,14 @@ type PostgresConfig struct {
 	GoogleAuthFile string `json:"google_auth_file"`
 }
 
-func GetAppConfig() *Config {
+func GetAppConfig() Config {
 	return appConfig
 }
 
-func SetAppConfig(cfg *Config) {
+func SetAppConfig(cfg Config) {
 	appConfig = cfg
+	appConfig.assignEnv()
+	appConfig.Info()
 }
 
 func (c *Config) Info() {
@@ -82,7 +85,7 @@ func (c *Config) Info() {
 	pp.Println(c)
 }
 
-func (c *Config) AssignEnv() {
+func (c *Config) assignEnv() {
 	if os.Getenv("APPLICATION_NAME") != "" {
 		c.ApplicationName = os.Getenv("APPLICATION_NAME")
 	}
@@ -95,26 +98,20 @@ func (c *Config) AssignEnv() {
 	if os.Getenv("CONSUL_ACL_TOKEN") != "" {
 		c.Consul.ACLToken = os.Getenv("CONSUL_ACL_TOKEN")
 	}
-
-	if os.Getenv("CONSUL_ACL_TOKEN") != "" {
-		c.Consul.ACLToken = os.Getenv("CONSUL_ACL_TOKEN")
+	if os.Getenv("LOGSTASH_IP") != "" {
+		c.LogStash.IP = os.Getenv("LOGSTASH_IP")
+	}
+	if os.Getenv("LOGSTASH_PORT") != "" {
+		c.LogStash.Port = os.Getenv("LOGSTASH_PORT")
 	}
 
-	if os.Getenv("CONSUL_ACL_TOKEN") != "" {
-		c.Consul.ACLToken = os.Getenv("CONSUL_ACL_TOKEN")
-	}
+	c.ServerPort = ServerPort
 
-	if os.Getenv("CONSUL_ACL_TOKEN") != "" {
-		c.Consul.ACLToken = os.Getenv("CONSUL_ACL_TOKEN")
-	}
-
-	if os.Getenv("CONSUL_ACL_TOKEN") != "" {
-		c.Consul.ACLToken = os.Getenv("CONSUL_ACL_TOKEN")
-	}
 }
 
 func DefaultConfig() *Config {
 	return &Config{
+		ProjectDir:      "",
 		ApplicationName: "",
 		Databases: DBConfig{
 			PostgresDB: PostgresConfig{
@@ -142,5 +139,8 @@ func DefaultConfig() *Config {
 		Zipkin: Zipkin{
 			URL: "",
 		},
+		Env:        0,
+		Consul:     Consul{},
+		ServerPort: "",
 	}
 }

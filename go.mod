@@ -5,7 +5,7 @@ go 1.16
 replace root => ./
 
 require (
-	github.com/bshuster-repo/logrus-logstash-hook  v0.4.1
+	github.com/bshuster-repo/logrus-logstash-hook v0.4.1
 	github.com/casbin/casbin/v2 v2.1.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/garyburd/redigo v1.6.2
@@ -29,6 +29,8 @@ require (
 	github.com/subosito/gotenv v1.2.0
 	github.com/swaggo/swag v1.7.6
 	github.com/ugorji/go v1.2.6 // indirect
+	go.elastic.co/apm v1.14.0 // indirect
+	go.elastic.co/apm/module/apmgorilla v1.14.0
 	golang.org/x/crypto v0.0.0-20210812204632-0ba0e8f03122
 	golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e // indirect
 	google.golang.org/protobuf v1.27.1 // indirect

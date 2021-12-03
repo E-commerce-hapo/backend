@@ -5,9 +5,11 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/go-resty/resty/v2"
 	"net/http"
 	"time"
+
+	"github.com/go-resty/resty/v2"
+	"go.elastic.co/apm"
 )
 
 type RestyConfig struct {
@@ -38,16 +40,19 @@ func IsNullJsonRaw(data json.RawMessage) bool {
 }
 
 type SendRequestArgs struct {
-	URL                string
-	Req                interface{}
-	Resp               interface{}
-	Headers            map[string]string
-	QueryParams        map[string]string
-	Method             string
-	HandleResponseFunc func(context.Context, *resty.Response, interface{}) error
+	URL                 string
+	Req                 interface{}
+	Resp                interface{}
+	Headers             map[string]string
+	QueryParams         map[string]string
+	Method              string
+	HandleResponseFunc  func(context.Context, *resty.Response, interface{}) error
+	ExternalServiceName string
 }
 
 func SendRequest(ctx context.Context, args SendRequestArgs) error {
+	span, ctx := apm.StartSpan(ctx, fmt.Sprintf("%v %v", args.Method, args.URL), args.ExternalServiceName)
+	defer span.End()
 	client := &http.Client{
 		Timeout: 10 * time.Second,
 		Transport: &http.Transport{

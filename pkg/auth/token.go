@@ -32,7 +32,7 @@ type SessionInfo struct {
 }
 
 type JWTCustomClaims struct {
-	UserID idx.ID
+	UserID idx.ID `json:"user_id"`
 	jwt.StandardClaims
 }
 

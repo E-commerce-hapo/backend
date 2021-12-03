@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/kiem-toan/pkg/config"
+	"github.com/kiem-toan/core/config"
 	"github.com/kiem-toan/pkg/env"
 
 	"github.com/kiem-toan/pkg/httpx"

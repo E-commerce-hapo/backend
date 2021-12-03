@@ -3,10 +3,11 @@ package httpx
 import (
 	"context"
 	"encoding/json"
-	"github.com/kiem-toan/pkg/errorx"
 	"io"
 	"net/http"
 	"strconv"
+
+	"github.com/kiem-toan/pkg/errorx"
 )
 
 func ParseRequest(r *http.Request, p interface{}) error {

@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/k0kubun/pp"
+	log2 "github.com/kiem-toan/pkg/log"
 
-	"github.com/kiem-toan/pkg/config"
+	"github.com/kiem-toan/core/config"
 	"github.com/kiem-toan/pkg/httpreq"
 
 	consulAPI "github.com/hashicorp/consul/api"
@@ -108,7 +108,6 @@ func RegisterConsulWatcher(cfgCh chan config.Config, cfg *Config) *watch.Plan {
 	}
 	// Đăng ký một watcher - watcher này sẽ ngóng sự thay đổi từ consul server
 	// khi có một sự thay đổi thì nó sẽ báo về cho consul client
-	pp.Println(strings.TrimPrefix(`config/`+cfg.ApplicationName+`/data`, "/"))
 	watcher, err := consulClient.RegisterWatcher("key", strings.TrimPrefix(`config/`+cfg.ApplicationName+`/data`, "/"))
 	if err != nil {
 		log.Fatal(err)
@@ -123,10 +122,7 @@ func RegisterConsulWatcher(cfgCh chan config.Config, cfg *Config) *watch.Plan {
 			if err != nil {
 				log.Fatal(err)
 			}
-			config.ApplicationName = os.Getenv("APPLICATION_NAME")
-			config.Consul.Port = os.Getenv("CONSUL_PORT")
-			config.Consul.IP = os.Getenv("CONSUL_IP")
-			config.Consul.ACLToken = os.Getenv("CONSUL_ACL_TOKEN")
+			log2.SetLoglevel(config.Log.Level)
 			cfgCh <- config
 		}
 	}
