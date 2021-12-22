@@ -1,4 +1,4 @@
-version: "3.9"
+version: '3.3'
 
 services:
 #  hapo_server:
@@ -9,9 +9,10 @@ services:
 #    ports:
 #      - 8080:8080
 #    depends_on:
-#      - postgres
-#    networks: ["go_develop"]
-  postgres:
+#      - hapo_postgres
+#    networks:
+#      - elk
+  hapo_postgres:
     container_name: hapo_postgres
     image: postgres:12
     environment:
@@ -20,79 +21,102 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - 5432:5432
-    networks: ["go_develop"]
+    networks:
+      - elk
     restart: always
     volumes:
       - ./db:/docker-entrypoint-initdb.d/
-  elasticsearch:
-    build:
-      context: elasticsearch/
-      args:
-        ELK_VERSION: $ELK_VERSION
-    volumes:
-      - type: bind
-        source: ./elasticsearch/config/elasticsearch.yml
-        target: /usr/share/elasticsearch/config/elasticsearch.yml
-        read_only: true
-      - type: volume
-        source: elasticsearch
-        target: /usr/share/elasticsearch/data
+  hapo_elasticsearch:
+    container_name: hapo_elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.2
     ports:
       - "9200:9200"
       - "9300:9300"
+    configs:
+      - source: elastic_config
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
       ELASTIC_PASSWORD: changeme
       # Use single node discovery in order to disable production mode and avoid bootstrap checks.
       # see: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
       discovery.type: single-node
+      # Force publishing on the 'elk' overlay.
+      network.publish_host: _eth0_
     networks:
       - elk
-  logstash:
-    build:
-      context: logstash/
-      args:
-        ELK_VERSION: $ELK_VERSION
-    volumes:
-      - type: bind
-        source: ./logstash/config/logstash.yml
-        target: /usr/share/logstash/config/logstash.yml
-        read_only: true
-      - type: bind
-        source: ./logstash/pipeline
-        target: /usr/share/logstash/pipeline
-        read_only: true
+    deploy:
+      mode: replicated
+      replicas: 1
+  hapo_logstash:
+    container_name: hapo_logstash
+    image: docker.elastic.co/logstash/logstash:7.16.2
     ports:
       - "5044:5044"
-      - "5000:5000/tcp"
-      - "5000:5000/udp"
+      - "5000:5000"
       - "9600:9600"
+    configs:
+      - source: logstash_config
+        target: /usr/share/logstash/config/logstash.yml
+      - source: logstash_pipeline
+        target: /usr/share/logstash/pipeline/logstash.conf
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks:
       - elk
-    depends_on:
-      - elasticsearch
-
-  kibana:
-    build:
-      context: kibana/
-      args:
-        ELK_VERSION: $ELK_VERSION
-    volumes:
-      - type: bind
-        source: ./kibana/config/kibana.yml
-        target: /usr/share/kibana/config/kibana.yml
-        read_only: true
+    deploy:
+      mode: replicated
+      replicas: 1
+  hapo_kibana:
+    container_name: hapo_kibana
+    image: docker.elastic.co/kibana/kibana:7.16.2
     ports:
       - "5601:5601"
+    configs:
+      - source: kibana_config
+        target: /usr/share/kibana/config/kibana.yml
     networks:
       - elk
+    deploy:
+      mode: replicated
+      replicas: 1
+  hapo_apm:
+    container_name: hapo_apm
+    image: docker.elastic.co/apm/apm-server:7.13.0
+    cap_add: [ "CHOWN", "DAC_OVERRIDE", "SETGID", "SETUID" ]
+    cap_drop: [ "ALL" ]
+    ports:
+      - 8200:8200
     depends_on:
-      - elasticsearch
+      - hapo_elasticsearch
+      - hapo_kibana
+    networks:
+      - elk
+    command: >
+      apm-server -e
+        -E apm-server.rum.enabled=true
+        -E setup.kibana.host=localhost:5601
+        -E setup.template.settings.index.number_of_replicas=0
+        -E apm-server.kibana.enabled=true
+        -E apm-server.kibana.host=localhost:5601
+        -E output.elasticsearch.hosts=["localhost:9200"]
+    healthcheck:
+      interval: 10s
+      retries: 12
+      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:8200/
+configs:
+  elastic_config:
+    file: ./elasticsearch/config/elasticsearch.yml
+  logstash_config:
+    file: ./logstash/config/logstash.yml
+  logstash_pipeline:
+    file: ./logstash/pipeline/logstash.conf
+  kibana_config:
+    file: ./kibana/config/kibana.yml
+
 networks:
-  elk:
   go_develop:
     driver: bridge
-volumes:
-  elasticsearch:
+  elk:
+    driver: overlay
+    attachable: true
