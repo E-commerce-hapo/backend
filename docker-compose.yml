@@ -1,17 +1,17 @@
 version: '3.3'
 
 services:
-#  hapo_server:
-#    container_name: hapo_server
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    ports:
-#      - 8080:8080
-#    depends_on:
-#      - hapo_postgres
-#    networks:
-#      - elk
+  hapo_server:
+    container_name: hapo_server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      - hapo_postgres
+    networks:
+      - elk
   hapo_postgres:
     container_name: hapo_postgres
     image: postgres:12

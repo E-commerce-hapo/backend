@@ -2,7 +2,10 @@ package config
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/k0kubun/pp"
 
@@ -24,9 +27,7 @@ type Config struct {
 	Databases       DBConfig `json:"databases"`
 	Log             Log      `json:"log"`
 	LogStash        LogStash
-	Zipkin          Zipkin      `json:"zipkin"`
 	Env             env.EnvType `json:"env"`
-	Consul          Consul      `json:"consul"`
 	ServerPort      string
 }
 
@@ -43,10 +44,6 @@ type Log struct {
 type LogStash struct {
 	Port string `json:"port"`
 	IP   string `json:"ip"`
-}
-
-type Zipkin struct {
-	URL string `json:"url"`
 }
 
 type DBConfig struct {
@@ -89,15 +86,6 @@ func (c *Config) assignEnv() {
 	if os.Getenv("APPLICATION_NAME") != "" {
 		c.ApplicationName = os.Getenv("APPLICATION_NAME")
 	}
-	if os.Getenv("CONSUL_IP") != "" {
-		c.Consul.IP = os.Getenv("CONSUL_IP")
-	}
-	if os.Getenv("CONSUL_PORT") != "" {
-		c.Consul.Port = os.Getenv("CONSUL_PORT")
-	}
-	if os.Getenv("CONSUL_ACL_TOKEN") != "" {
-		c.Consul.ACLToken = os.Getenv("CONSUL_ACL_TOKEN")
-	}
 	if os.Getenv("LOGSTASH_IP") != "" {
 		c.LogStash.IP = os.Getenv("LOGSTASH_IP")
 	}
@@ -107,6 +95,14 @@ func (c *Config) assignEnv() {
 
 	c.ServerPort = ServerPort
 
+}
+
+func Asset(name string) ([]byte, error) {
+	base := filepath.Join(appConfig.ProjectDir, "core/config")
+	if strings.Contains(name, "..") {
+		panic(fmt.Sprintf("invalid name (%v)", name))
+	}
+	return ioutil.ReadFile(filepath.Join(base, name))
 }
 
 func DefaultConfig() *Config {
@@ -136,11 +132,7 @@ func DefaultConfig() *Config {
 			Port: "",
 			IP:   "",
 		},
-		Zipkin: Zipkin{
-			URL: "",
-		},
 		Env:        0,
-		Consul:     Consul{},
 		ServerPort: "",
 	}
 }

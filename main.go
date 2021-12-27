@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -18,7 +19,6 @@ import (
 
 	"github.com/kiem-toan/core/config"
 	"github.com/kiem-toan/pkg/env"
-	"github.com/kiem-toan/pkg/integration/consul"
 	log2 "github.com/kiem-toan/pkg/log"
 	_ "github.com/lib/pq"
 )
@@ -38,21 +38,19 @@ func init() {
 // @license.name   HAPO
 // @host           localhost:8080
 func main() {
-	var cfgCh = make(chan config.Config, 1)
-	watcher := consul.RegisterConsulWatcher(cfgCh, &consul.Config{
-		ApplicationName: os.Getenv("APPLICATION_NAME"),
-		ConsulAclToken:  os.Getenv("CONSUL_ACL_TOKEN"),
-		ConsulIP:        os.Getenv("CONSUL_IP"),
-		ConsulPort:      os.Getenv("CONSUL_PORT"),
-	})
-	defer watcher.Stop()
-
 	var s *http.Server
 	for {
-		cfg := <-cfgCh
+		bytes, err := config.Asset("config.json")
+		if err != nil {
+			log2.Fatal(err, nil, nil)
+		}
+		var cfg config.Config
+		err = json.Unmarshal(bytes, &cfg)
+		if err != nil {
+			log2.Fatal(err, nil, nil)
+		}
 		cfg.ProjectDir, _ = os.Getwd()
 		config.SetAppConfig(cfg)
-		log2.Info("absa", nil, nil)
 		app, err := build.InitApp(cfg)
 		if err != nil {
 			panic(err)
