@@ -3,8 +3,6 @@ package route
 import (
 	"net/http"
 
-	log2 "github.com/kiem-toan/pkg/log"
-	zipkinhttp "github.com/openzipkin/zipkin-go/middleware/http"
 	"go.elastic.co/apm/module/apmgorilla"
 
 	"github.com/kiem-toan/pkg/doc/swagger"
@@ -15,7 +13,6 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/kiem-toan/cmd/audit-server/build"
-	intzipkin "github.com/kiem-toan/pkg/zipkin"
 )
 
 type Route struct {
@@ -27,18 +24,7 @@ type Route struct {
 
 func NewRouter(routes []Route) *mux.Router {
 	router := mux.NewRouter()
-
 	apmgorilla.Instrument(router)
-
-	// Config Zipkin Tracing with Zipkin Middleware
-	tracer, err := intzipkin.NewTracer()
-	if err != nil {
-		log2.Fatal(err, nil, nil)
-	}
-	router.Use(zipkinhttp.NewServerMiddleware(
-		tracer,
-		zipkinhttp.SpanName("Request")),
-	)
 
 	// Create Sub Router by API Type
 	swaggerRouter := router.PathPrefix("/docs").Subrouter()

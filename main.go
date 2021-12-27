@@ -52,14 +52,14 @@ func main() {
 		cfg := <-cfgCh
 		cfg.ProjectDir, _ = os.Getwd()
 		config.SetAppConfig(cfg)
-		log2.Info("absa", nil, nil)
+		log2.Info("1232121absa", nil, nil)
 		app, err := build.InitApp(cfg)
 		if err != nil {
 			panic(err)
 		}
 
 		routes := route.AllRoutes(app)
-		var router = route.NewRouter(routes)
+		router := route.NewRouter(routes)
 		headersOk := handlers.AllowedHeaders([]string{"X-Requested-With"})
 		originsOk := handlers.AllowedOrigins([]string{`*`})
 		methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS", "DELETE"})

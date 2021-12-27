@@ -1,0 +1,20 @@
+{
+  "datacenter":"dc1",
+  "domain":"consul",
+  "data_dir":"/opt/bitnami/consul/data",
+  "pid_file":"/opt/bitnami/consul/tmp/consul.pid",
+  "server":true,
+  "ui":true,
+  "bootstrap_expect":1,
+  "addresses": {
+    "http":"0.0.0.0"
+  },
+  "retry_join": ["127.0.0.1"],
+  "ports": {
+    "http":8700,
+    "dns":8600,
+    "serf_lan":8301,
+    "server":8300
+  },
+  "serf_lan":"0.0.0.0"
+}
