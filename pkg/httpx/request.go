@@ -1,8 +1,8 @@
 package httpx
 
 import (
-	"github.com/kiem-toan/pkg/idx"
-	"github.com/kiem-toan/pkg/jsonx"
+	"github.com/E-commerce-hapo/backend/pkg/idx"
+	"github.com/E-commerce-hapo/backend/pkg/jsonx"
 )
 
 type IDRequest struct {

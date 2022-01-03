@@ -2,13 +2,11 @@ package log
 
 import (
 	"fmt"
-	"net"
 	"os"
 	"runtime"
 
 	"github.com/k0kubun/pp"
 
-	logrustash "github.com/bshuster-repo/logrus-logstash-hook"
 	"github.com/openzipkin/zipkin-go"
 	log "github.com/sirupsen/logrus"
 )
@@ -39,21 +37,21 @@ func SetLoglevel(level string) {
 }
 
 func RegisterLogStash(logstashIP, logstashPort, applicationName string) {
-	log.SetFormatter(&log.TextFormatter{
-		TimestampFormat: "02-01-2006 15:04:05",
-		FullTimestamp:   true,
-	})
-	SetLoglevel("info")
-	connLogstash, err := net.Dial("tcp", logstashIP+`:`+logstashPort)
-	if err != nil {
-		Fatal(err, nil, nil)
-	}
-
-	hook, err := logrustash.NewHookWithConn(connLogstash, applicationName)
-	if err != nil {
-		Fatal(err, nil, nil)
-	}
-	log.AddHook(hook)
+	//log.SetFormatter(&log.TextFormatter{
+	//	TimestampFormat: "02-01-2006 15:04:05",
+	//	FullTimestamp:   true,
+	//})
+	//SetLoglevel("info")
+	//connLogstash, err := net.Dial("tcp", logstashIP+`:`+logstashPort)
+	//if err != nil {
+	//	Fatal(err, nil, nil)
+	//}
+	//
+	//hook, err := logrustash.New(connLogstash, applicationName)
+	//if err != nil {
+	//	Fatal(err, nil, nil)
+	//}
+	//log.AddHook(hook)
 }
 
 func Trace(err error, span zipkin.Span, fields map[string]interface{}) {

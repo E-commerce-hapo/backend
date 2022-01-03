@@ -4,37 +4,45 @@ import (
 	"context"
 	"strings"
 
-	service_common "github.com/kiem-toan/domain/service/common"
+	"github.com/E-commerce-hapo/backend/pkg/errorx"
 
-	"github.com/kiem-toan/pkg/idx"
+	"github.com/E-commerce-hapo/backend/application/category"
+	"github.com/E-commerce-hapo/backend/entity"
 
-	service_category "github.com/kiem-toan/domain/service/category"
+	"github.com/E-commerce-hapo/backend/pkg/paging"
 
-	repo_cateogry "github.com/kiem-toan/domain/repository/category"
+	"github.com/E-commerce-hapo/backend/pkg/idx"
 
 	"gorm.io/gorm"
 
-	"github.com/kiem-toan/pkg/database"
+	"github.com/E-commerce-hapo/backend/pkg/database"
 )
 
-type CategoryStore struct {
+var ErrAgencyNotFound = errorx.Errorf(404, nil, "agency_not_found")
+
+type ICategoryRepository interface {
+	CreateCategory(context.Context, *category.Category) error
+	ListCategories(context.Context) ([]*category.Category, error)
+}
+
+type categoryRepository struct {
 	gormDB *gorm.DB
 }
 
-var _ repo_cateogry.CategoryRepositoryService = &CategoryStore{}
+var _ ICategoryRepository = &categoryRepository{}
 
-type CategoryStoreFactory func(ctx context.Context) *CategoryStore
+type CategoryStoreFactory func(ctx context.Context) *categoryRepository
 
 func NewCategoryStore(db *database.Database) CategoryStoreFactory {
-	return func(ctx context.Context) *CategoryStore {
-		return &CategoryStore{
+	return func(ctx context.Context) *categoryRepository {
+		return &categoryRepository{
 			gormDB: db.Db,
 		}
 	}
 }
 
-func (s *CategoryStore) WithPaging(ctx context.Context, p *service_common.Paging) (*CategoryStore, error) {
-	err := p.Validate(&repo_cateogry.Category{})
+func (s *categoryRepository) WithPaging(ctx context.Context, p *paging.Paging) (*categoryRepository, error) {
+	err := p.Validate(&entity.Category{})
 	if err != nil {
 		return nil, err
 	}
@@ -47,9 +55,9 @@ func (s *CategoryStore) WithPaging(ctx context.Context, p *service_common.Paging
 	return s, nil
 }
 
-func (s *CategoryStore) CreateCategory(ctx context.Context, category *service_category.Category) error {
-	s.gormDB.AutoMigrate(&repo_cateogry.Category{})
-	categoryDB := &repo_cateogry.Category{
+func (s *categoryRepository) CreateCategory(ctx context.Context, category *category.Category) error {
+	s.gormDB.AutoMigrate(&entity.Category{})
+	categoryDB := &entity.Category{
 		ID:          idx.NewID(),
 		Name:        category.Name,
 		Description: category.Description,
@@ -58,7 +66,7 @@ func (s *CategoryStore) CreateCategory(ctx context.Context, category *service_ca
 	return s.createCategoryDB(ctx, categoryDB)
 }
 
-func (s *CategoryStore) createCategoryDB(ctx context.Context, categoryDB *repo_cateogry.Category) error {
+func (s *categoryRepository) createCategoryDB(ctx context.Context, categoryDB *entity.Category) error {
 	tx := s.gormDB.Create(categoryDB)
 	if tx.Error != nil {
 		return tx.Error
@@ -66,7 +74,7 @@ func (s *CategoryStore) createCategoryDB(ctx context.Context, categoryDB *repo_c
 	return nil
 }
 
-func (s *CategoryStore) listCategoriesDB(ctx context.Context) (categoriesDB []*repo_cateogry.Category, err error) {
+func (s *categoryRepository) listCategoriesDB(ctx context.Context) (categoriesDB []*entity.Category, err error) {
 	tx := s.gormDB.Find(&categoriesDB)
 	if tx.Error != nil {
 		return nil, tx.Error
@@ -74,10 +82,11 @@ func (s *CategoryStore) listCategoriesDB(ctx context.Context) (categoriesDB []*r
 	return categoriesDB, nil
 }
 
-func (s *CategoryStore) ListCategories(ctx context.Context) ([]*service_category.Category, error) {
+func (s *categoryRepository) ListCategories(ctx context.Context) ([]*category.Category, error) {
+	s.gormDB.AutoMigrate(&entity.Category{})
 	categories, err := s.listCategoriesDB(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return repo_cateogry.Convert_model_Categories_to_service_Categories(categories), nil
+	return entity.Convert_model_Categories_to_service_Categories(categories), nil
 }

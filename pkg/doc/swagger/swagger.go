@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/kiem-toan/core/config"
+	"github.com/E-commerce-hapo/backend/core/config"
 )
 
 func RedocHandler() http.HandlerFunc {

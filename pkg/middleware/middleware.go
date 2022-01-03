@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/kiem-toan/pkg/httpx"
-	log2 "github.com/kiem-toan/pkg/log"
+	"github.com/E-commerce-hapo/backend/pkg/httpx"
+	log2 "github.com/E-commerce-hapo/backend/pkg/log"
 	"github.com/openzipkin/zipkin-go"
 )
 

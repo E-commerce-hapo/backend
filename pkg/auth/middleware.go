@@ -5,14 +5,14 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/kiem-toan/core/config"
-	"github.com/kiem-toan/pkg/env"
+	"github.com/E-commerce-hapo/backend/core/config"
+	"github.com/E-commerce-hapo/backend/pkg/env"
 
-	"github.com/kiem-toan/pkg/httpx"
+	"github.com/E-commerce-hapo/backend/pkg/httpx"
 
-	"github.com/kiem-toan/pkg/authorize/auth"
+	"github.com/E-commerce-hapo/backend/pkg/authorize/auth"
 
-	"github.com/kiem-toan/pkg/errorx"
+	"github.com/E-commerce-hapo/backend/pkg/errorx"
 )
 
 func CORS(next http.Handler) http.HandlerFunc {
@@ -49,8 +49,8 @@ func CORS(next http.Handler) http.HandlerFunc {
 	}
 }
 
-func TokenAuthMiddleware(next http.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func TokenAuthMiddleware(next http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		err := ValidateToken(r)
 		if err != nil {
@@ -80,4 +80,5 @@ func TokenAuthMiddleware(next http.Handler) http.HandlerFunc {
 		ctx = context.WithValue(ctx, "ss", sessionInfo)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	}
+	return http.HandlerFunc(fn)
 }

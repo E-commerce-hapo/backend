@@ -8,16 +8,15 @@ import (
 
 	"gorm.io/gorm/logger"
 
-	log2 "github.com/kiem-toan/pkg/log"
+	log2 "github.com/E-commerce-hapo/backend/pkg/log"
 
-	"github.com/kiem-toan/core/config"
+	"github.com/E-commerce-hapo/backend/core/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 type Database struct {
-	Db  *gorm.DB
-	abs string
+	Db *gorm.DB
 }
 
 func New(d config.Config) *Database {

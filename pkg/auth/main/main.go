@@ -7,9 +7,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/kiem-toan/pkg/auth"
+	"github.com/E-commerce-hapo/backend/pkg/auth"
 
-	"github.com/kiem-toan/pkg/idx"
+	"github.com/E-commerce-hapo/backend/pkg/idx"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"

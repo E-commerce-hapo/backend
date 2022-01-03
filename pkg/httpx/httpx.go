@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/kiem-toan/pkg/errorx"
+	"github.com/E-commerce-hapo/backend/pkg/errorx"
 )
 
 func ParseRequest(r *http.Request, p interface{}) error {
@@ -21,9 +21,9 @@ func ParseRequest(r *http.Request, p interface{}) error {
 }
 
 func WriteError(ctx context.Context, w http.ResponseWriter, err error) {
-	errIn := errorx.ToErrorInterface(err)
-	statusCode := errIn.GetCode()
-	jsonErr := errorx.ToJSONError(errIn)
+	errInterface := errorx.ToErrorInterface(err)
+	statusCode := errInterface.GetCode()
+	jsonErr := errorx.ToJSONError(errInterface)
 	errBody, err := json.Marshal(&jsonErr)
 	if err != nil {
 		errBody = []byte("{\"type\": \"internal\", \"msg\": \"There was an error but it could not be serialized into JSON\"}") // fallback
@@ -39,8 +39,8 @@ func WriteError(ctx context.Context, w http.ResponseWriter, err error) {
 }
 
 func WriteReponse(ctx context.Context, w http.ResponseWriter, status int, payload interface{}) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	response, err := json.Marshal(payload)
-	w.Header().Set("Content-Type", "application/json")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`Can not marshal response`))

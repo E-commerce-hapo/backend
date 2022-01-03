@@ -3,7 +3,7 @@ package httpx
 import (
 	"net/http"
 
-	"github.com/kiem-toan/pkg/jsonx"
+	"github.com/E-commerce-hapo/backend/pkg/jsonx"
 )
 
 type loggingResponseWriter struct {

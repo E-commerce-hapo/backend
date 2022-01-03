@@ -9,13 +9,14 @@ import (
 
 // err ...
 type internalError struct {
-	Code     int
-	Err      error
-	Message  string
-	Original string
-	OrigFile string
-	OrigLine int
-	Meta     map[string]string
+	Code       int
+	StatusCode int
+	Err        error
+	Message    string
+	Original   string
+	OrigFile   string
+	OrigLine   int
+	Meta       map[string]string
 }
 
 func DefaultErrorMessage(code int) string {
@@ -77,7 +78,7 @@ func newInternalError(code int, message string, err error) *internalError {
 }
 
 // Error return ErrorInterface
-func Error(code int, message string, err error) ErrorInterface {
+func Error(code int, err error, message string) ErrorInterface {
 	return newInternalError(code, message, err)
 }
 
@@ -174,3 +175,5 @@ func ToErrorInterface(err error) ErrorInterface {
 
 	return xerr
 }
+
+type ErrorFunc func(error) error

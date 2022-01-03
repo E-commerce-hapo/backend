@@ -1,5 +1,5 @@
 # Thương mại điện tử Ecommerce
-Tạo mới token HOTP, validate HOTP
+Các chức năng của 1 hệ thống thương mại điện tử
 ## Tài liệu tham khảo để code
 { \
 &nbsp; &nbsp; "databases": {\
@@ -53,22 +53,13 @@ docker run -d -p 8080:8080 -e {env name}={ env value} {repo address}/{name image
 + Example:
 + docker run -d -p 8080:8080 -e CONSUL_IP=10.91.120.55 -e CONSUL_PORT=8500 -e LOGSTASH_IP=10.90.68.35 -e LOGSTASH_PORT=30204 -e CONSUL_ACL_TOKEN=7caf93ca-2112-2f84-3bc9-39e812983ed1 -e APPLICATION_NAME=otp-api -e SERVER_PORT=8080 10.91.120.43:8000/repository/mobile-project/golang-hotp:v1.2.7
 
-+Lưu ý: FIXED_OTP chỉ có giá trị khi ở môi trường dev/test, đây là giá trị otp luôn trả kết quả thành công
 ### Run with main.go
 + cd vào project
-+ Gõ lệnh go run main.go
++ Gõ lệnh go run cmd/hapo-server/main.go
 
-### Các lỗi gặp phải khi cài đặt
-- "gcc": executable file not found in %PATH% : https://stackoverflow.com/questions/43580131/exec-gcc-executable-file-not-found-in-path-when-trying-go-build (lỗi này ở window)
--  swag: command not found :
-    + https://github.com/swaggo/swag/issues/209
-    + go get -v -u github.com/swaggo/swag/cmd/swag
-    + export PATH=$PATH:$HOME/go/bin
-    + swag init
-    + truy cập swag tại máy localhost thì truy cập vào link  http://localhost:8080/swagger/index.html
 
 ## Author
-## tiendc@mafc.com.vn
+## kimhai.ngvan@gmail.com
 
 
 

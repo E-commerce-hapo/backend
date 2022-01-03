@@ -9,8 +9,8 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 
-	"github.com/kiem-toan/pkg/errorx"
-	"github.com/kiem-toan/pkg/idx"
+	"github.com/E-commerce-hapo/backend/pkg/errorx"
+	"github.com/E-commerce-hapo/backend/pkg/idx"
 )
 
 const (

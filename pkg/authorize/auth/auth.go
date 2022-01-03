@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/E-commerce-hapo/backend/pkg/authorize/adapter"
 	"github.com/casbin/casbin/v2/model"
-	"github.com/kiem-toan/pkg/authorize/adapter"
 
 	"github.com/casbin/casbin/v2"
 )

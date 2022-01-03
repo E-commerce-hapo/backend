@@ -1,39 +1,28 @@
-module github.com/kiem-toan
+module github.com/E-commerce-hapo/backend
 
 go 1.16
 
-replace root => ./
-
 require (
-	github.com/bshuster-repo/logrus-logstash-hook v0.4.1
-	github.com/casbin/casbin/v2 v2.1.2
+	github.com/bshuster-repo/logrus-logstash-hook v1.0.2
+	github.com/casbin/casbin/v2 v2.40.6
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/garyburd/redigo v1.6.2
-	github.com/gin-gonic/gin v1.7.3
+	github.com/garyburd/redigo v1.6.3
+	github.com/gin-gonic/gin v1.7.7
+	github.com/go-chi/chi v1.5.4
 	github.com/go-openapi/spec v0.20.4
-	github.com/go-playground/validator/v10 v10.9.0 // indirect
-	github.com/go-resty/resty/v2 v2.4.0
-	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/wire v0.5.0
-	github.com/gorilla/handlers v1.5.1
-	github.com/gorilla/mux v1.7.3
-	github.com/hashicorp/consul/api v1.3.0
-	github.com/json-iterator/go v1.1.11 // indirect
+	github.com/hashicorp/consul/api v1.12.0
 	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
 	github.com/k0kubun/pp v3.0.1+incompatible
-	github.com/lib/pq v1.10.2
-	github.com/mattn/go-colorable v0.1.8 // indirect
-	github.com/mattn/go-isatty v0.0.13 // indirect
-	github.com/openzipkin/zipkin-go v0.2.2
+	github.com/lib/pq v1.10.4
+	github.com/openzipkin/zipkin-go v0.3.0
+	github.com/pressly/goose/v3 v3.5.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/subosito/gotenv v1.2.0
-	github.com/swaggo/swag v1.7.6
-	github.com/ugorji/go v1.2.6 // indirect
-	go.elastic.co/apm v1.14.0 // indirect
-	go.elastic.co/apm/module/apmgorilla v1.14.0
-	golang.org/x/crypto v0.0.0-20210812204632-0ba0e8f03122
-	golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e // indirect
-	google.golang.org/protobuf v1.27.1 // indirect
-	gorm.io/driver/postgres v1.1.0
-	gorm.io/gorm v1.21.11
+	github.com/swaggo/swag v1.7.8
+	go.elastic.co/apm v1.15.0
+	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3
+	gorm.io/driver/postgres v1.2.3
+	gorm.io/gorm v1.22.4
 )

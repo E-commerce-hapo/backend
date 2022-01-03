@@ -17,13 +17,13 @@ COPY . .
 
 # Build the Go app
 
-RUN go get -v -u github.com/swaggo/swag/cmd/swag
-RUN swag init
-RUN go build -o main ./
+#RUN go get -v -u github.com/swaggo/swag/cmd/swag
+#RUN swag init ./cmd/hapo-backend
+RUN go build -o main ./cmd/hapo-backend
 RUN rm -rf /tmp/*
 
 # Expose port 8080 to the outside world
 EXPOSE 8080
 
 # Command to run the executable
-CMD ["./main"]
+CMD ["/app/main"]

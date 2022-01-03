@@ -1,8 +1,8 @@
 package product
 
 import (
+	"github.com/E-commerce-hapo/backend/application/product/pm"
 	"github.com/google/wire"
-	"github.com/kiem-toan/application/product/pm"
 )
 
 var WireSet = wire.NewSet(

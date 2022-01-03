@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/kiem-toan/pkg/errorx"
+	"github.com/E-commerce-hapo/backend/pkg/errorx"
 
 	"github.com/casbin/casbin/v2/model"
 	"github.com/casbin/casbin/v2/persist"
@@ -22,7 +22,7 @@ func NewAdapter(line string) *Adapter {
 
 func (sa *Adapter) LoadPolicy(model model.Model) error {
 	if sa.Line == "" {
-		return errorx.Error(http.StatusInternalServerError, "invalid line, line cannot be empty", nil)
+		return errorx.Error(http.StatusInternalServerError, nil, "invalid line, line cannot be empty")
 	}
 	strs := strings.Split(sa.Line, "\n")
 
