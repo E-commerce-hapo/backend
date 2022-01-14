@@ -1,8 +1,8 @@
 package paging
 
 import (
+	"errors"
 	"fmt"
-	"net/http"
 	"reflect"
 	"strings"
 
@@ -36,13 +36,13 @@ func (p *Paging) Validate(model interface{}) error {
 			lowerSort := strings.ToLower(sort)             // created_at desc
 			lowerSortStrs := strings.Split(lowerSort, " ") // ["created_at", "desc"]
 			if len(lowerSortStrs) != 2 {
-				return errorx.Errorf(http.StatusBadRequest, nil, "Sort does not valid")
+				return errorx.ErrInternal(errors.New(fmt.Sprintf("Sort does not valid")))
 			}
 			sortField := lowerSortStrs[0]                             // "created_at"
 			normalizedField := strings.ReplaceAll(sortField, "_", "") // createdat
 			isContained := cm_array.ListStringsContain(normalizedColumns, normalizedField)
 			if !isContained {
-				return errorx.Errorf(http.StatusBadRequest, nil, fmt.Sprintf("Sorted field %v does not exist in table", normalizedField))
+				return errorx.ErrInternal(errors.New(fmt.Sprintf("Sorted field %v does not exist in table", normalizedField)))
 			}
 		}
 	}

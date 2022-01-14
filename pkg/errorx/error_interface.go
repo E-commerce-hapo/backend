@@ -2,7 +2,12 @@ package errorx
 
 type ErrorInterface interface {
 	// GetCode is of the valid err codes.
-	GetCode() int
+	GetCode() string
+
+	// 	GetStatusCode int is of the status code.
+	GetStatusCode() int
+
+	GetTitle() string
 
 	// Msg returns a human-readable, unstructured messages describing the err.
 	Msg() string
@@ -10,8 +15,6 @@ type ErrorInterface interface {
 	// WithMeta returns a copy of the Error with the given key-value pair attached
 	// as metadata. If the key is already set, it is overwritten.
 	WithMeta(key string, val string) ErrorInterface
-
-	WithMetaM(m map[string]string) ErrorInterface
 
 	// GetMeta returns the stored value for the given key. If the key has no set
 	// value, Meta returns an empty string. There is no way to distinguish between

@@ -50,7 +50,7 @@ func (h *CategoryHandler) CreateCategory(w http.ResponseWriter, r *http.Request)
 func (h *CategoryHandler) ListCategories(w http.ResponseWriter, r *http.Request) {
 	var q ListCategoriesRequest
 	if err := httpx.ParseRequest(r, &q); err != nil {
-		httpx.WriteError(r.Context(), w, errorx.Errorf(http.StatusBadRequest, err, "Can not parse request"))
+		httpx.WriteError(r.Context(), w, errorx.ErrInvalidParameter(err))
 		return
 	}
 	response, err := h.CategoryQuery.ListCategories(r.Context(), &category.ListCategoriesArgs{Paging: &paging.Paging{
@@ -68,7 +68,7 @@ func (h *CategoryHandler) ListCategories(w http.ResponseWriter, r *http.Request)
 func (h *CategoryHandler) CreateTokenHandler(w http.ResponseWriter, r *http.Request) {
 	var t CreateCategoryRequest
 	if err := httpx.ParseRequest(r, &t); err != nil {
-		httpx.WriteError(r.Context(), w, errorx.Errorf(http.StatusBadRequest, err, "Can not parse request"))
+		httpx.WriteError(r.Context(), w, errorx.ErrInvalidParameter(err))
 		return
 	}
 	token, err := auth.GenerateToken(1234)
@@ -82,7 +82,7 @@ func (h *CategoryHandler) CreateTokenHandler(w http.ResponseWriter, r *http.Requ
 func (h *CategoryHandler) VerifyTokenHandler(w http.ResponseWriter, r *http.Request) {
 	var t CreateCategoryRequest
 	if err := httpx.ParseRequest(r, &t); err != nil {
-		httpx.WriteError(r.Context(), w, errorx.Errorf(http.StatusBadRequest, err, "Can not parse request"))
+		httpx.WriteError(r.Context(), w, errorx.ErrInvalidParameter(err))
 		return
 	}
 	claims, err := auth.GetCustomClaimsFromRequest(r)
@@ -96,7 +96,7 @@ func (h *CategoryHandler) VerifyTokenHandler(w http.ResponseWriter, r *http.Requ
 func (h *CategoryHandler) GetTokenDataHandler(w http.ResponseWriter, r *http.Request) {
 	var t CreateCategoryRequest
 	if err := httpx.ParseRequest(r, &t); err != nil {
-		httpx.WriteError(r.Context(), w, errorx.Errorf(http.StatusBadRequest, err, "Can not parse request"))
+		httpx.WriteError(r.Context(), w, errorx.ErrInvalidParameter(err))
 		return
 	}
 	claims, err := auth.GetCustomClaimsFromRequest(r)

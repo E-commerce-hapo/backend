@@ -1,8 +1,8 @@
 package dispatcher
 
 import (
+	"errors"
 	"fmt"
-	"net/http"
 	"reflect"
 
 	"github.com/E-commerce-hapo/backend/pkg/errorx"
@@ -37,7 +37,7 @@ func (d *Dispatcher) AddEventListner(eventListener listener.Listener, event inte
 func (d *Dispatcher) Dispatch(event interface{}) error {
 	eventType := reflect.TypeOf(event)
 	if _, ok := d.events[eventType]; !ok {
-		return errorx.Errorf(http.StatusInternalServerError, nil, fmt.Sprintf("The '%s' event is not registered", eventType.String()))
+		return errorx.ErrInternal(errors.New(fmt.Sprintf("The '%s' event is not registered", eventType.String())))
 	}
 	listens := d.events[eventType]
 	for _, listen := range listens {

@@ -21,21 +21,17 @@ func ParseRequest(r *http.Request, p interface{}) error {
 }
 
 func WriteError(ctx context.Context, w http.ResponseWriter, err error) {
-	errInterface := errorx.ToErrorInterface(err)
-	statusCode := errInterface.GetCode()
-	jsonErr := errorx.ToJSONError(errInterface)
+	errIn := errorx.ToErrorInterface(err)
+	jsonErr := errorx.ToErrorJSON(errIn)
 	errBody, err := json.Marshal(&jsonErr)
 	if err != nil {
 		errBody = []byte("{\"type\": \"internal\", \"msg\": \"There was an error but it could not be serialized into JSON\"}") // fallback
 	}
 	w.Header().Set("Content-Type", "application/json") // Error responses are always JSON
 	w.Header().Set("Content-Length", strconv.Itoa(len(errBody)))
-	w.WriteHeader(statusCode) // set HTTP status code and send response
+	w.WriteHeader(errIn.GetStatusCode()) // set HTTP status code and send response
 
-	_, writeErr := w.Write(errBody)
-	if writeErr != nil {
-		_ = writeErr
-	}
+	w.Write(errBody)
 }
 
 func WriteReponse(ctx context.Context, w http.ResponseWriter, status int, payload interface{}) {

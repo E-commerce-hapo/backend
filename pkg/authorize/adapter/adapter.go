@@ -1,7 +1,8 @@
 package adapter
 
 import (
-	"net/http"
+	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/E-commerce-hapo/backend/pkg/errorx"
@@ -22,7 +23,7 @@ func NewAdapter(line string) *Adapter {
 
 func (sa *Adapter) LoadPolicy(model model.Model) error {
 	if sa.Line == "" {
-		return errorx.Error(http.StatusInternalServerError, nil, "invalid line, line cannot be empty")
+		return errorx.ErrInternal(errors.New(fmt.Sprintf("invalid line, line cannot be empty")))
 	}
 	strs := strings.Split(sa.Line, "\n")
 

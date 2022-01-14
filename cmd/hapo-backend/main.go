@@ -11,15 +11,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/E-commerce-hapo/backend/registry"
-	server2 "github.com/E-commerce-hapo/backend/server"
-
+	_ "github.com/lib/pq"
 	"github.com/subosito/gotenv"
 
 	"github.com/E-commerce-hapo/backend/core/config"
 	"github.com/E-commerce-hapo/backend/pkg/env"
 	log2 "github.com/E-commerce-hapo/backend/pkg/log"
-	_ "github.com/lib/pq"
+	"github.com/E-commerce-hapo/backend/registry"
+	server2 "github.com/E-commerce-hapo/backend/server"
 )
 
 func init() {

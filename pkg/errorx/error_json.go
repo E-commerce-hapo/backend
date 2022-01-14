@@ -1,26 +1,29 @@
 package errorx
 
 import (
-	"fmt"
 	"strings"
 )
 
-// JSONError sẽ là cấu trúc Error API trả về cho client
-type JSONError struct {
-	Code string            `json:"code"`
-	Msg  string            `json:"msg"`
-	Meta map[string]string `json:"meta,omitempty"`
+// ErrorJSON sẽ là cấu trúc Error API trả về cho client
+type ErrorJSON struct {
+	StatusCode int               `json:"status_code"`
+	Code       string            `json:"code"`
+	Title      string            `json:"title"`
+	Msg        string            `json:"msg"`
+	Meta       map[string]string `json:"meta,omitempty"`
 }
 
-func ToJSONError(errInterface ErrorInterface) *JSONError {
-	return &JSONError{
-		Code: fmt.Sprint(errInterface.GetCode()),
-		Msg:  errInterface.Msg(),
-		Meta: errInterface.MetaMap(),
+func ToErrorJSON(errInterface ErrorInterface) *ErrorJSON {
+	return &ErrorJSON{
+		StatusCode: errInterface.GetStatusCode(),
+		Code:       errInterface.GetCode(),
+		Msg:        errInterface.Msg(),
+		Title:      errInterface.GetTitle(),
+		Meta:       errInterface.MetaMap(),
 	}
 }
 
-func (e *JSONError) Error() (s string) {
+func (e *ErrorJSON) Error() (s string) {
 	if len(e.Meta) == 0 {
 		return e.Msg
 	}

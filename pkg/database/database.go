@@ -6,13 +6,12 @@ import (
 	"os"
 	"time"
 
-	"gorm.io/gorm/logger"
-
-	log2 "github.com/E-commerce-hapo/backend/pkg/log"
-
-	"github.com/E-commerce-hapo/backend/core/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+
+	"github.com/E-commerce-hapo/backend/core/config"
+	log2 "github.com/E-commerce-hapo/backend/pkg/log"
 )
 
 type Database struct {

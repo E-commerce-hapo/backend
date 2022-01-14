@@ -1,11 +1,11 @@
 package server
 
 import (
-	"github.com/E-commerce-hapo/backend/pkg/auth"
-	"github.com/E-commerce-hapo/backend/registry"
 	"github.com/go-chi/chi"
 
 	categoryhandler "github.com/E-commerce-hapo/backend/application/category/handler"
+	"github.com/E-commerce-hapo/backend/pkg/auth"
+	"github.com/E-commerce-hapo/backend/registry"
 )
 
 type CategoryServer struct {

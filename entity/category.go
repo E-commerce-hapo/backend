@@ -1,9 +1,10 @@
 package entity
 
 import (
+	"gorm.io/gorm"
+
 	"github.com/E-commerce-hapo/backend/application/category"
 	"github.com/E-commerce-hapo/backend/pkg/idx"
-	"gorm.io/gorm"
 )
 
 // gorm.Model

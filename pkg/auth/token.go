@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -77,14 +78,15 @@ func GenerateToken(userID idx.ID) (*TokenDetails, error) {
 func getTokenStrFromHeader(header http.Header) (string, error) {
 	s := header.Get(AuthorizationHeader)
 	if s == "" {
-		return "", errorx.Errorf(http.StatusUnauthorized, nil, "Missing authorization string")
+
+		return "", errorx.ErrAuthFailure(errors.New(fmt.Sprintf("Missing authorization string.")))
 	}
 	splits := strings.SplitN(s, " ", 2)
 	if len(splits) < 2 {
-		return "", errorx.Errorf(http.StatusUnauthorized, nil, "Bad authorization string")
+		return "", errorx.ErrAuthFailure(errors.New(fmt.Sprintf("Bad authorization string.")))
 	}
 	if splits[0] != AuthorizationScheme {
-		return "", errorx.Errorf(http.StatusUnauthorized, nil, "Request unauthenticated with "+AuthorizationScheme)
+		return "", errorx.ErrAuthFailure(errors.New(fmt.Sprintf("Request unauthenticated with %v", AuthorizationScheme)))
 	}
 	return splits[1], nil
 }
@@ -104,19 +106,22 @@ func getTokenFromRequest(r *http.Request) (*jwt.Token, error) {
 	if err != nil {
 		if ve, ok := err.(*jwt.ValidationError); ok {
 			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
-				return nil, errorx.Errorf(http.StatusUnauthorized, nil, "Validation Error Malformed")
+				errorx.ErrAuthFailure(errors.New(fmt.Sprintf("Validation Error Malformed")))
+				return nil, errorx.ErrAuthFailure(errors.New(fmt.Sprintf("Validation Error Malformed")))
 			} else if ve.Errors&jwt.ValidationErrorExpired != 0 {
 				// Token is expired
-				return nil, errorx.Errorf(http.StatusUnauthorized, nil, "Token have already expried")
+
+				return nil, errorx.ErrAccessTokenExpired(errors.New(fmt.Sprintf("Token have already expried")))
+
 			} else if ve.Errors&jwt.ValidationErrorNotValidYet != 0 {
-				return nil, errorx.Errorf(http.StatusUnauthorized, nil, "Validation Error Not Valid Yet")
+				return nil, errorx.ErrInvalidAccessToken(errors.New(fmt.Sprintf("Validation Error Not Valid Yet")))
 			} else {
-				return nil, errorx.Errorf(http.StatusUnauthorized, nil, "Token Invalid")
+				return nil, errorx.ErrInvalidAccessToken(errors.New(fmt.Sprintf("Token Invalid")))
 			}
 		}
 	}
 	if time.Now().Unix() > atClaims.ExpiresAt {
-		return nil, errorx.Errorf(http.StatusUnauthorized, nil, "Token have already expried")
+		return nil, errorx.ErrInvalidAccessToken(errors.New(fmt.Sprintf("Token Invalid")))
 	}
 	if err != nil {
 		return nil, err
@@ -127,7 +132,8 @@ func getTokenFromRequest(r *http.Request) (*jwt.Token, error) {
 func GetCustomClaimsFromRequest(r *http.Request) (*JWTCustomClaims, error) {
 	token, err := getTokenFromRequest(r)
 	if err != nil {
-		return nil, errorx.Errorf(http.StatusUnauthorized, err, "Can not verify token. Token does not valid")
+		return nil, errorx.ErrInvalidAccessToken(errors.New(fmt.Sprintf("Token Invalid")))
+
 	}
 
 	claim, ok := token.Claims.(*JWTCustomClaims)
@@ -149,25 +155,26 @@ func RefreshToken(refreshToken string) (*TokenDetails, error) {
 
 	// If there is an error, the token must have expired
 	if err != nil {
-		return nil, errorx.Errorf(http.StatusUnauthorized, nil, "Refresh token expired")
+		return nil, errorx.ErrRefreshTokenExpired(errors.New(fmt.Sprintf("Refresh token expired")))
 	}
 
 	// Check token valid
 	if _, ok := token.Claims.(JWTCustomClaims); !ok || !token.Valid {
-		return nil, errorx.Errorf(http.StatusUnauthorized, err, "Refresh token does not valid")
+		return nil, errorx.ErrInvalidRefreshToken(errors.New(fmt.Sprintf("Refresh token does not valid")))
 	}
 
 	// Generate new tokens
 	customClaims, _ = token.Claims.(JWTCustomClaims)
 	userID := customClaims.UserID
 	if userID == 0 {
-		return nil, errorx.Errorf(http.StatusUnprocessableEntity, nil, "Unauthorized")
+		return nil, errorx.ErrAuthFailure(errors.New(fmt.Sprintf("Unauthorized")))
 	}
 
 	//Create new pairs of refresh and access tokens
 	ts, err := GenerateToken(userID)
 	if err != nil {
-		return nil, errorx.Errorf(http.StatusForbidden, nil, err.Error())
+		return nil, errorx.ErrForbidden(err)
+
 	}
 	return ts, nil
 }

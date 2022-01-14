@@ -4,8 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/E-commerce-hapo/backend/pkg/errorx"
-
 	"github.com/E-commerce-hapo/backend/application/category"
 	"github.com/E-commerce-hapo/backend/entity"
 
@@ -17,8 +15,6 @@ import (
 
 	"github.com/E-commerce-hapo/backend/pkg/database"
 )
-
-var ErrAgencyNotFound = errorx.Errorf(404, nil, "agency_not_found")
 
 type ICategoryRepository interface {
 	CreateCategory(context.Context, *category.Category) error

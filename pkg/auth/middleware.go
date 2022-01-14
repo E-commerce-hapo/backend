@@ -2,6 +2,8 @@ package auth
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -70,7 +72,7 @@ func TokenAuthMiddleware(next http.Handler) http.Handler {
 		e := auth.New()
 
 		if !e.Check(rolesAfterGetFromDB, action) {
-			httpx.WriteError(ctx, w, errorx.Errorf(http.StatusUnauthorized, nil, "Không tìm thấy hoặc cần quyền truy cập."))
+			httpx.WriteError(ctx, w, errorx.ErrAuthFailure(errors.New(fmt.Sprintf("Không tìm thấy hoặc cần quyền truy cập."))))
 			return
 		}
 		sessionInfo := &SessionInfo{}

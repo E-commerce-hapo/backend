@@ -3,8 +3,8 @@ package email
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
-	"net/http"
 	"net/smtp"
 
 	"github.com/k0kubun/pp"
@@ -92,13 +92,13 @@ func (c *Client) Dial() (*smtp.Client, error) {
 		return client, err
 
 	default:
-		return nil, errorx.Errorf(http.StatusInternalServerError, nil, "Unknown encryption: %v", encrypt)
+		return nil, errorx.ErrInternal(errors.New(fmt.Sprintf("Unknown encryption: %v", encrypt)))
 	}
 }
 
 func (c *Client) SendMail(ctx context.Context, cmd *SendEmailCommand) error {
 	if len(cmd.ToAddresses) == 0 {
-		return errorx.Errorf(http.StatusInternalServerError, nil, "Missing email address")
+		return errorx.ErrInternal(errors.New(fmt.Sprintf("Missing email address")))
 	}
 
 	addrs := make([]string, len(cmd.ToAddresses))
@@ -109,7 +109,7 @@ func (c *Client) SendMail(ctx context.Context, cmd *SendEmailCommand) error {
 	err := c.sendMail(ctx, addrs, cmd)
 	pp.Println(cmd, addrs, err)
 	if err != nil {
-		return errorx.Errorf(http.StatusInternalServerError, err, "Không thể gửi email đến địa chỉ %v (%v). Nếu cần thêm thông tin, vui lòng liên hệ %v.")
+		return errorx.ErrInternal(errors.New(fmt.Sprintf("Không thể gửi email đến địa chỉ %v (%v). Nếu cần thêm thông tin, vui lòng liên hệ %v.")))
 
 	}
 	return nil
