@@ -3,6 +3,8 @@ package server
 import (
 	"net/http"
 
+	"github.com/E-commerce-hapo/backend/pkg/doc/swagger"
+
 	"github.com/E-commerce-hapo/backend/registry"
 
 	"github.com/go-chi/chi"
@@ -26,6 +28,10 @@ func (s *Server) router() chi.Router {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	//apmgorilla.Instrument(r)
+	r.Route("/docs", func(r chi.Router) {
+		r.Mount("/", swagger.RedocHandler())
+		r.Mount("/swagger.json", swagger.SwaggerHandler("./swagger.json"))
+	})
 	r.Route("/api", func(r chi.Router) {
 		r.Mount("/category", s.categoryServer.router())
 	})
